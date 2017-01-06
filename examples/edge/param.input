@@ -1,0 +1,15 @@
+#[run]
+test
+0.5 0.00025
+#[materials]
+fvp.bin fvs.bin fro.bin
+401 401 0.5
+#[boundaries]
+1 20 0.7
+#[source]
+1 2 2
+30. 0.05
+100. 50. 
+#[receiver]
+facqui.ascii
+0.00025
