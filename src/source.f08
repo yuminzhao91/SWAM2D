@@ -6,6 +6,16 @@ module source
 
 contains
 
+  subroutine srcindex(xs, zs, npml, h, is1, is2)
+    
+    integer :: npml, is1, is2
+    real :: xs, zs, h
+
+    is1 = nint(zs/h)+npml+1
+    is2 = nint(xs/h)+npml+1
+
+  end subroutine srcindex
+
   subroutine ricker(nt, dt, f0, t0, tsrc)
     
     integer :: it, nt
@@ -15,8 +25,8 @@ contains
     pi = 4.*atan(1.)
 
     do it=1,nt
-       t = float(it-1)*dt
-       sigma = (pi*f0*(t-t0))*(pi*f0*(t-t0)) 
+       t = float(it-1)*dt-t0
+       sigma = (pi*f0*(t))*(pi*f0*(t)) 
        tsrc(it) = (1.-2.*sigma)*exp(-1.*sigma)
     end do
 
@@ -54,10 +64,6 @@ contains
           gsrc(i1, i2) = gsrc(i1, i2)/betasum
        end do
     end do
-
-    open(21, file='srcspread.bin', access='direct', recl=n1e*n2e*4)
-    write(21, rec=1) gsrc
-    close(21)
 
   end subroutine srcspread
 
