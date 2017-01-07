@@ -2,9 +2,10 @@ FC=gfortran
 FFLAGS=-W -Wall -O3 -ffast-math -fno-protect-parens -fstack-arrays -march=native
 LDFLAGS=
 BIN=../bin/
+LIB=../lib/
 EXEC=fdpsv
-#SRCF=$(wildcard *.f08)
-SRC=param.f08 acquisition.f08 types.f08 boundaries.f08 deriv.f08 marching.f08 source.f08 model.f08 main.f08
+#SRC=$(wildcard mod_*.f08) main.f08
+SRC=mod_param.f08 mod_acquisition.f08 mod_types.f08 mod_boundaries.f08 mod_deriv.f08 mod_marching.f08 mod_source.f08 mod_model.f08 mod_main.f08
 OBJ=$(SRC:.f08=.o)
 
 all: $(BIN)/$(EXEC)
