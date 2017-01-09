@@ -1,0 +1,11 @@
+# Latex auxilliary files
+*.aux
+*.idx
+*.ilg
+*.ind
+*.log
+*.out
+*.toc
+
+# PDF file
+*.pdf

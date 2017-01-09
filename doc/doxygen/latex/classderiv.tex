@@ -1,0 +1,148 @@
+\hypertarget{classderiv}{\section{deriv Module Reference}
+\label{classderiv}\index{deriv@{deriv}}
+}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+subroutine \hyperlink{classderiv_ac21b6cd6df4475862b1aff089f1ae25f}{dxforward} (f, n1, n2, d)
+\item 
+subroutine \hyperlink{classderiv_a37b7e1130ab66fe4374bb59cbce5f25b}{dxbackward} (f, n1, n2, d)
+\item 
+subroutine \hyperlink{classderiv_a18a7090476375df6b783cf132c95176a}{dzforward} (f, n1, n2, d)
+\item 
+subroutine \hyperlink{classderiv_a5ec4f27003a2a501235ff4ecadc002b2}{dzbackward} (f, n1, n2, d)
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classderiv_ad38c71b2f4408bf4a30862643887d9a5}{real, parameter {\bfseries c1} =(9./8.)}\label{classderiv_ad38c71b2f4408bf4a30862643887d9a5}
+
+\item 
+\hypertarget{classderiv_adf98c3293e2fe044ff33d9d4a746c38f}{real, parameter {\bfseries c2} =(-\/1./24.)}\label{classderiv_adf98c3293e2fe044ff33d9d4a746c38f}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\begin{DoxyAuthor}{Author}
+Damien Pageot 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+09 Jan 2017 
+\end{DoxyDate}
+
+
+Definition at line 9 of file mod\-\_\-deriv.\-f08.
+
+
+
+\subsection{Member Function/\-Subroutine Documentation}
+\hypertarget{classderiv_a37b7e1130ab66fe4374bb59cbce5f25b}{\index{deriv@{deriv}!dxbackward@{dxbackward}}
+\index{dxbackward@{dxbackward}!deriv@{deriv}}
+\subsubsection[{dxbackward}]{\setlength{\rightskip}{0pt plus 5cm}subroutine deriv\-::dxbackward (
+\begin{DoxyParamCaption}
+\item[{real, dimension(n1, n2)}]{f, }
+\item[{integer}]{n1, }
+\item[{integer}]{n2, }
+\item[{real, dimension(n1, n2)}]{d}
+\end{DoxyParamCaption}
+)}}\label{classderiv_a37b7e1130ab66fe4374bb59cbce5f25b}
+4th order backward derivative in the x-\/direction.\par
+ $ D(i) = f(i)-f(i-1) $. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em d} & derivative \\
+\hline
+\mbox{\tt in}  & {\em f} & array of size n1$\ast$n2 to derive \\
+\hline
+\mbox{\tt in}  & {\em n1} & The number of grid points in the first direction (z) \\
+\hline
+\mbox{\tt in}  & {\em n2} & The number of grid points in the second direction (x) \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 43 of file mod\-\_\-deriv.\-f08.
+
+\hypertarget{classderiv_ac21b6cd6df4475862b1aff089f1ae25f}{\index{deriv@{deriv}!dxforward@{dxforward}}
+\index{dxforward@{dxforward}!deriv@{deriv}}
+\subsubsection[{dxforward}]{\setlength{\rightskip}{0pt plus 5cm}subroutine deriv\-::dxforward (
+\begin{DoxyParamCaption}
+\item[{real, dimension(n1, n2)}]{f, }
+\item[{integer}]{n1, }
+\item[{integer}]{n2, }
+\item[{real, dimension(n1, n2)}]{d}
+\end{DoxyParamCaption}
+)}}\label{classderiv_ac21b6cd6df4475862b1aff089f1ae25f}
+4th order forward derivative in the x-\/direction.\par
+ $ D(i) = f(i+1)-f(i) $. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em d} & derivative \\
+\hline
+\mbox{\tt in}  & {\em f} & array of size n1$\ast$n2 to derive \\
+\hline
+\mbox{\tt in}  & {\em n1} & The number of grid points in the first direction (z) \\
+\hline
+\mbox{\tt in}  & {\em n2} & The number of grid points in the second direction (x) \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 17 of file mod\-\_\-deriv.\-f08.
+
+\hypertarget{classderiv_a5ec4f27003a2a501235ff4ecadc002b2}{\index{deriv@{deriv}!dzbackward@{dzbackward}}
+\index{dzbackward@{dzbackward}!deriv@{deriv}}
+\subsubsection[{dzbackward}]{\setlength{\rightskip}{0pt plus 5cm}subroutine deriv\-::dzbackward (
+\begin{DoxyParamCaption}
+\item[{real, dimension(n1, n2)}]{f, }
+\item[{integer}]{n1, }
+\item[{integer}]{n2, }
+\item[{real, dimension(n1, n2)}]{d}
+\end{DoxyParamCaption}
+)}}\label{classderiv_a5ec4f27003a2a501235ff4ecadc002b2}
+4th order backward derivative in the z-\/direction.\par
+ $ D(i) = f(i)-f(i-1) $. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em d} & derivative \\
+\hline
+\mbox{\tt in}  & {\em f} & array of size n1$\ast$n2 to derive \\
+\hline
+\mbox{\tt in}  & {\em n1} & The number of grid points in the first direction (z) \\
+\hline
+\mbox{\tt in}  & {\em n2} & The number of grid points in the second direction (x) \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 95 of file mod\-\_\-deriv.\-f08.
+
+\hypertarget{classderiv_a18a7090476375df6b783cf132c95176a}{\index{deriv@{deriv}!dzforward@{dzforward}}
+\index{dzforward@{dzforward}!deriv@{deriv}}
+\subsubsection[{dzforward}]{\setlength{\rightskip}{0pt plus 5cm}subroutine deriv\-::dzforward (
+\begin{DoxyParamCaption}
+\item[{real, dimension(n1, n2)}]{f, }
+\item[{integer}]{n1, }
+\item[{integer}]{n2, }
+\item[{real, dimension(n1, n2)}]{d}
+\end{DoxyParamCaption}
+)}}\label{classderiv_a18a7090476375df6b783cf132c95176a}
+4th order forward derivative in the z-\/direction.\par
+ $ D(i) = f(i+1)-f(i) $. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em d} & derivative \\
+\hline
+\mbox{\tt in}  & {\em f} & array of size n1$\ast$n2 to derive \\
+\hline
+\mbox{\tt in}  & {\em n1} & The number of grid points in the first direction (z) \\
+\hline
+\mbox{\tt in}  & {\em n2} & The number of grid points in the second direction (x) \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 69 of file mod\-\_\-deriv.\-f08.
+
+
+
+The documentation for this module was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+src/mod\-\_\-deriv.\-f08\end{DoxyCompactItemize}

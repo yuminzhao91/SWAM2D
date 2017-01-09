@@ -1,3 +1,11 @@
+!------------------------------------------------------------------------------
+! MODULE: deriv
+!------------------------------------------------------------------------------
+!> @author Damien Pageot
+!> @date 09 Jan 2017
+!------------------------------------------------------------------------------
+! Revision history
+
 module deriv
 
   implicit none
@@ -7,8 +15,12 @@ module deriv
 contains
 
   subroutine dxforward(f, n1, n2, d)
-    ! >> dxforward
-    !    D(i) = f(i+1)-f(i)
+    !> @brief 4th order forward derivative in the x-direction.\n
+    !> \f$ D(i) = f(i+1)-f(i) \f$.
+    !> @param[out] d  derivative
+    !> @param[in]  f  array of size n1*n2 to derive
+    !> @param[in]  n1 The number of grid points in the first direction (z)
+    !> @param[in]  n2 The number of grid points in the second direction (x)
     integer :: i2
     integer :: n1, n2
     real :: f(n1, n2)
@@ -29,8 +41,12 @@ contains
   end subroutine dxforward
 
   subroutine dxbackward(f, n1, n2, d)
-    ! >> dxbackward
-    !    D(i) = f(i)-f(i-1)
+    !> @brief 4th order backward derivative in the x-direction.\n
+    !> \f$ D(i) = f(i)-f(i-1) \f$.
+    !> @param[out] d  derivative
+    !> @param[in]  f  array of size n1*n2 to derive
+    !> @param[in]  n1 The number of grid points in the first direction (z)
+    !> @param[in]  n2 The number of grid points in the second direction (x)
     integer :: i2
     integer :: n2, n1
     real :: f(n1, n2)
@@ -51,8 +67,12 @@ contains
   end subroutine dxbackward
 
   subroutine dzforward(f, n1, n2, d)
-    ! >> dzforward
-    !    D(i) = f(i+1)-f(i)
+    !> @brief 4th order forward derivative in the z-direction.\n
+    !> \f$ D(i) = f(i+1)-f(i) \f$.
+    !> @param[out] d  derivative
+    !> @param[in]  f  array of size n1*n2 to derive
+    !> @param[in]  n1 The number of grid points in the first direction (z)
+    !> @param[in]  n2 The number of grid points in the second direction (x)
     integer :: i1
     integer :: n2, n1
     real :: f(n1, n2)
@@ -73,8 +93,12 @@ contains
   end subroutine dzforward
 
   subroutine dzbackward(f, n1, n2, d)
-    ! >> dzbackward
-    !    D(i) = f(i)-f(i-1)
+    !> @brief 4th order backward derivative in the z-direction.\n
+    !> \f$ D(i) = f(i)-f(i-1) \f$.
+    !> @param[out] d  derivative
+    !> @param[in]  f  array of size n1*n2 to derive
+    !> @param[in]  n1 The number of grid points in the first direction (z)
+    !> @param[in]  n2 The number of grid points in the second direction (x)
     integer :: i1
     integer :: n2, n1
     real :: f(n1, n2)
