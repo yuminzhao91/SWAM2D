@@ -1,3 +1,43 @@
+!------------------------------------------------------------------------------
+! MODULE: marching
+!------------------------------------------------------------------------------
+!> @brief
+!> ...
+!!
+!> @details
+!> \latexonly
+!> \begin{small}
+!> \begin{eqnarray}
+!> D^{+}_{t}u_{t}(m,n,l-1/2) =\frac{1}{\rho(m,n)}[
+!> D^{-}_{x}\tau_{xx}(m+1/2,n,l) +
+!> D^{-}_{z}\tau_{xz}(m,n+1/2,l)]
+!> \\
+!> D^{+}_{t}w_{t}(m+1/2,n+1/2,l-1/2)=\frac{1}{\rho(m+1/2,n+1/2)}[
+!> D^{+}_{x}\tau_{xz}(m,n+1/2,l) +
+!> D^{+}_{z}\tau_{zz}(m+1/2,n,l)]
+!> \\
+!> D^{+}_{t}\tau_{xx}(m+1/2,n,l) = 
+!> [\lambda(m+1/2,n)+2\mu(m+1/2,n)]D^{+}_{x}u_{t}(m,n,l+1/2) \nonumber\\
+!> + \lambda(m+1/2,n)D^{-}_{z}w_{t}(m+1/2,n+1/2,l+1/2)]&
+!> \\
+!> D^{+}_{t}\tau_{xz}(m,n+1/2,l) = 
+!> \mu(m,n+1/2)[D^{+}_{z}u_{t}(m,n,l+1/2)+
+!> D^{-}_{x}w_{t}(m+1/2,n+1/2,l+1/2)]
+!> \\
+!> D^{+}_{t}\tau_{zz} = 
+!> [\lambda(m+1/2,n)+2\mu(m+1/2,n)]D^{-}_{z}w_{t}(m+1/2,n+1/2,l+1/2)\nonumber \\
+!> + \lambda(m+1/2,n)D^{+}_{x}u_{t}(m,n,l+1/2)&
+!> \end{eqnarray}
+!> \end{small}
+!> \endlatexonly
+!!
+!> \cite levander1988fourth
+!!
+!> @author Damien Pageot
+!> @date 09 Jan 2017
+!------------------------------------------------------------------------------
+! Revision history
+
 module marching
   
   use types

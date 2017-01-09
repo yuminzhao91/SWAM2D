@@ -93,7 +93,7 @@ SHOW_FILES             = YES
 SHOW_NAMESPACES        = YES
 FILE_VERSION_FILTER    = 
 LAYOUT_FILE            = 
-CITE_BIB_FILES         = 
+CITE_BIB_FILES         = doc/doxygen/latex/references.bib
 #---------------------------------------------------------------------------
 # Configuration options related to warning and progress messages
 #---------------------------------------------------------------------------
@@ -213,7 +213,7 @@ LATEX_CMD_NAME         = latex
 MAKEINDEX_CMD_NAME     = makeindex
 COMPACT_LATEX          = NO
 PAPER_TYPE             = a4
-EXTRA_PACKAGES         = 
+EXTRA_PACKAGES         = amsmath
 LATEX_HEADER           = 
 LATEX_FOOTER           = 
 LATEX_EXTRA_FILES      = 
@@ -222,7 +222,7 @@ USE_PDFLATEX           = YES
 LATEX_BATCHMODE        = NO
 LATEX_HIDE_INDICES     = NO
 LATEX_SOURCE_CODE      = NO
-LATEX_BIB_STYLE        = plain
+LATEX_BIB_STYLE        = apalike
 #---------------------------------------------------------------------------
 # Configuration options related to the RTF output
 #---------------------------------------------------------------------------
