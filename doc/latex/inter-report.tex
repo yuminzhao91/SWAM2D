@@ -1,0 +1,130 @@
+\documentclass{vibris}
+\usepackage{natbib}
+\usepackage{graphics}
+\usepackage{chngcntr}
+%\counterwithout{subsubsection}{subsection}
+%\renewcommand\thesubsection{\arabic{subsection}}
+%\renewcommand{\thesection}{\Roman{section}} 
+\usepackage{sectsty}
+%\sectionfont{\large}  % sets colour of sections
+%\subsectionfont{\color{vibrisblue1}}
+%\usepackage[font={small,it}]{caption}
+\usepackage{rotating}
+\usepackage{emptypage}
+
+%\titleformat*{\section}{\small}
+%\titleformat{\section}{\normalfont\Large\bfseries}{\thesection}{5em}{}
+%\titleformat{\chapter}{\vspace{-2.0cm}\normalfont\huge}{\thechapter }{20pt}{\huge}
+%\sectionfont{\mdseries\LARGE}
+%\subsectionfont{\mdseries}
+%\subsubsectionfont{\mdseries}
+\let\leqslant=\leq
+
+
+%\makeatletter % access to internal commands
+%\renewcommand{\@seccntformat}[1]{\mdseries \csname the#1\endcsname\ }
+%\makeatother
+
+%\usepackage{tocloft}
+%\renewcommand{\cftchapfont}{\scshape}
+%\renewcommand{\cftsecfont}{\mdseries\huge}
+%\renewcommand{\cftfigfont}{Figure }
+%\renewcommand{\cfttabfont}{Table }
+
+%\newtheorem{theorem}{Theorem}[section]
+
+\newcommand{\psm}{small-scale physical modeling method}
+\newcommand{\bialt}{\textit{BiAlt} }
+\newcommand{\cmnt}[1]{}
+
+%\usepackage{soul}
+
+\usepackage[dvipsnames]{xcolor}
+\usepackage{minibox}
+
+%\usepackage{lineno}
+\usepackage{graphicx}
+\usepackage{color}
+
+\definecolor{vibrisblue1}{RGB}{90,151,190}
+\definecolor{vibrisblue2}{RGB}{25,96,177}
+
+%\renewcommand*\familydefault{}
+\newcommand{\subtitle}{FDPSV}
+
+%\makeatletter
+%\def\@maketitle{%
+
+
+
+\usepackage{imakeidx}
+\mdseries
+
+\begin{document}
+
+\begin{titlepage}
+  \newpage
+  \null
+  \vskip 10.0em
+  \let\center\flushleft
+  {\noindent \huge{\bf FDPSV} \par}
+  \vskip -0.5em
+  {\noindent \rule{\textwidth}{0.3em} \par}
+
+  {\hfill Documentation for FDPSV version 0.1 \par}
+  
+  {\hfill 10 January 2017 \par}
+  
+  \vfill
+  
+  {\noindent \Large{Damien Pageot}}
+  \vskip -0.5em
+  {\noindent \rule{\textwidth}{0.2em} \par}
+  \vskip 1.0cm
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+%\title{FDPSV 0.1}
+%\subtitle{FDPSV PROSE}
+%\author{Andrew Roberts\\
+%   école d'informatique,\\
+%   Université de Leeds,\\
+%   Leeds,\\
+%   Royaume-Uni,\\
+%   LS2 1HE\\
+%   \texttt{andyr@comp.leeds.ac.uk}}
+%\date{\today}
+
+%\maketitle
+
+%\newgeometry{a4paper,left=5mm,right=5mm,top=5mm,bottom=5mm}
+%\begin{titlepage} %
+%	\vspace{10cm}
+%	\Huge{\textbf{\sffamily FDPSV 0.1}}\\
+%	\hrule
+%	\vspace{1cm}
+%	\large{\sffamily Damien Pageot}\\
+%	\normalsize{\sffamily\textit{damien.pageot@ifsttar.fr}}\\
+%\ end{titlepage}
+
+%\restoregeometry
+
+\thispagestyle{empty}
+\clearpage\newpage
+
+% ----------------------------------------------------------------------
+% GENERAL INTRODUCTION
+% ----------------------------------------------------------------------
+\section{Introduction}
+\index{Introduction}
+
+% ----------------------------------------------------------------------
+% References
+% ----------------------------------------------------------------------
+
+\bibliography{bibvibris,GJInt2016src-review/GJInt2016.bib, EGU2016/bibvibris}
+
+
+\end{document}
