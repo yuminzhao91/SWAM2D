@@ -1,3 +1,16 @@
+!------------------------------------------------------------------------------
+! MODULE: model
+!------------------------------------------------------------------------------
+!> \brief subroutines to read, to extend and calculate physical parameter
+!> models.
+!------------------------------------------------------------------------------
+!> \author Damien Pageot
+!> \date 09 Jan 2017
+!------------------------------------------------------------------------------
+! Revision history
+! 09 Jan 2017: Add doxygen documentation
+!------------------------------------------------------------------------------
+
 module model
 
   implicit none
@@ -5,7 +18,13 @@ module model
 contains
 
   subroutine modread(fname, n1, n2, v)
-
+    !! subroutine: modread
+    !> \brief read an input binary file (single precision).
+    !> \param[in] fname name of the input physical parameter file
+    !> \param[in] n1 The number of grid points in the first direction (z)
+    !> \param[in] n2 The number of grid points in the second direction (x)
+    !> \param[out] v single precision array of size (n1, n2) containing
+    !> parameter values.
     integer :: n1, n2
     real :: v(n1, n2)
     character(len=*) :: fname
@@ -17,7 +36,14 @@ contains
   end subroutine modread
 
   subroutine modext(v, n1, n2, nsp, ve)
-
+    !! subroutine: modext
+    !> \brief extend parameter model with absording boundary condition
+    !> (ABC) layers.
+    !> \param[in] v physical parameter array of size (n1, n2)
+    !> \param[in] n1 The number of grid points in the first direction (z)
+    !> \param[in] n2 The number of grid points in the second direction (x)
+    !> \param[in] nsp The number of grid points added for ABC layers 
+    !> \param[out] ve physical parameter array of size (n1+2*nsp, n2+2*nsp)
     integer :: i, n1, n2, n1e, n2e, nsp
     real :: v(n1, n2), ve(n1+2*nsp, n2+2*nsp)
 
@@ -36,7 +62,17 @@ contains
   end subroutine modext
   
   subroutine modbuo(roe, n1e, n2e, bux, buz)
-
+    !! subroutine: modbuo
+    !> \brief calculate buoyancies bux and buz from extend density
+    !> model to fulfill staggered-grid 4th order finite-differences
+    !> requierments.
+    !> \param[in] roe extend density model (array of size (n1e, n2e))
+    !> \param[in] n1e The number of grid points in the first direction (z)
+    !> of the extended grid
+    !> \param[in] n2 The number of grid points in the second direction (x)
+    !> of the extended grid
+    !> \param[out] bux buoyancy model for the x-direction
+    !> \param[out] buz buoyancy model for the z-direction
     integer :: i1, i2, n1e, n2e
     real, dimension(n1e, n2e) :: roe, bux, buz
 
@@ -53,7 +89,21 @@ contains
   end subroutine modbuo
 
   subroutine modlame(vpe, vse, roe, n1e, n2e, mu0, mue, lb0, lbmu)
-
+    !! subroutine: modlame
+    !> \brief calculate Lame's parameters \f$ \lambda \$, \$f \mu \f$
+    !> and \f$ mu_{e} \f$ from extend parameter models to fulfill
+    !> staggered-grid 4th order finite-differences requierments.
+    !> \param[in] vpe extend P-wave velocity model
+    !> \param[in] vse extend S-wave velocity model
+    !> \param[in] roe extend density model
+    !> \param[in] n1e The number of grid points in the first direction (z)
+    !> of the extended grid
+    !> \param[in] n2 The number of grid points in the second direction (x)
+    !> of the extended grid
+    !> \param[out] mu0 \f$ \mu \f$ on normal grid (grid points)
+    !> \param[out] mue \f$ \mu \f$ on staggered grid (intermediate gird points)
+    !> \param[out] lb0 \f$ \lambda \f$ on normal grid (grid points)
+    !> \param[out] lbmu \f$ \lambda+2\mu \f$ on normal grid (grid points)
     integer :: i1, i2, n1e, n2e
     real, dimension(n1e, n2e) :: vpe, vse, roe, mu0, mue, lb0, lbmu
 
