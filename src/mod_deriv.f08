@@ -21,9 +21,8 @@ module deriv
   
 contains
 
-  !> \brief 4th order forward derivative in the x-direction.\n
   subroutine dxforward(f, n1, n2, d)
-    !> \details
+    !> \brief 4th order forward derivative in the x-direction.\n
     !> \f$ D^{+}_{x} = c1*[f(i,j+1)-f(i,j)]+c2*[f(i,j+2)-f(i,j-1)]\f$.
     !> \param[out] d  derivative
     !> \param[in]  f  array of size n1*n2 to derive

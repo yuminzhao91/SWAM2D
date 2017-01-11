@@ -90,7 +90,7 @@ contains
 
   subroutine modlame(vpe, vse, roe, n1e, n2e, mu0, mue, lb0, lbmu)
     !! subroutine: modlame
-    !> \brief calculate Lame's parameters \f$ \lambda \$, \$f \mu \f$
+    !> \brief calculate Lame's parameters \f$ \lambda \f$, \$f \mu \f$
     !> and \f$ mu_{e} \f$ from extend parameter models to fulfill
     !> staggered-grid 4th order finite-differences requierments.
     !> \param[in] vpe extend P-wave velocity model
