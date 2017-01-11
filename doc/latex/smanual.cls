@@ -21,7 +21,7 @@
 %%    www.ctan.org
 %%
 \NeedsTeXFormat{LaTeX2e}[1996/12/01]
-\ProvidesClass{vibris}[2017/01/10 v1.0]
+\ProvidesClass{smanual}[2017/01/10 v1.0]
 %%
 %% Pass all options directly to 'article'
 %%

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['typemod',['typemod',['../a00040.html',1,'types']]]
+  ['acquisition',['acquisition',['../a00001.html',1,'']]]
 ];

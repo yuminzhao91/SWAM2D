@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['typemod',['typemod',['../a00040.html',1,'types']]],
-  ['types',['types',['../a00036.html',1,'']]]
+  ['typemod',['typemod',['../a00008.html',1,'types']]],
+  ['types',['types',['../a00009.html',1,'']]]
 ];
