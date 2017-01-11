@@ -116,6 +116,7 @@
 
 \RequirePackage{color}
 
+\definecolor{bashbkgd}{RGB}{209,214,217}
 \definecolor{butter1}{RGB}{252,233,79}
 \definecolor{butter2}{RGB}{237,212,0}
 \definecolor{butter3}{RGB}{196,160,0}

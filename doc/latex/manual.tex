@@ -14,6 +14,18 @@
 \newcommand{\cmnt}[1]{}
 
 
+
+\definecolor{light-gray}{gray}{0.95}
+\definecolor{bashgray}{RGB}{209,214,217}
+\newcommand{\addbash}[1]{
+	\begin{center}
+	\colorbox{bashgray}{\begin{minipage}{0.9\textwidth}
+  	\ttfamily \$ #1
+\end{minipage}}
+	\end{center}
+}
+
+
 \usepackage[dvipsnames]{xcolor}
 \usepackage{minibox}
 
@@ -76,10 +88,44 @@
 % ----------------------------------------------------------------------
 \section{Getting started}
 
+\subsection{Requirements}
+
+\noindent For FDPSV program:
+\begin{itemize}
+	\item GNU make $>=$ 4.1
+	\item GNU gfortran $>=$ 4.4/4.7
+\end{itemize}
+
+\noindent Optional for examples:
+\begin{itemize}
+	\item python $>=$ 2.7
+	\item python-numpy $>=$ 1.8.2
+\end{itemize}
+
+\noindent Optional:
+\begin{itemize}
+	\item Seismic Un*x $>=$ 43R1
+\end{itemize}
+
+\subsection{Compilation}
+
+\addbash{make}
+
+% ----------------------------------------------------------------------
+% Input parameters and files
+% ----------------------------------------------------------------------
+\section{Input parameters and files}
+
 % ----------------------------------------------------------------------
 % NUMERICAL EXAMPLES
 % ----------------------------------------------------------------------
 \section{Numerical examples}
+
+% ----------------------------------------------------------------------
+% License
+% ----------------------------------------------------------------------
+%\section*{License}
+%\input{gpl-3.0}
 
 % ----------------------------------------------------------------------
 % References
