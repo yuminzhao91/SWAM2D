@@ -1,0 +1,2 @@
+genacqui.py: generate acquisition file for fdpsv
+gensource.py: generate source file for fdpsv

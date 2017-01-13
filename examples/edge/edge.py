@@ -1,5 +1,37 @@
 #!/bin/python2.7
 
+"""
+Generate input parameter file, acquisition file and direct access binary
+model files to run with FDPSV.
+"""
+
+def genparam():
+    fparam = open('param.input', 'w')
+    fparam.write('#[run]\n')
+    fparam.write('test\n')
+    fparam.write('0.5 0.00025\n')
+    fparam.write('#[materials]\n')
+    fparam.write('fvp.bin fvs.bin fro.bin\n')
+    fparam.write('401 401 0.5\n')
+    fparam.write('#[boundaries]\n')
+    fparam.write('0 20 0.7\n')
+    fparam.write('#[source]\n')
+    fparam.write('2 2 2\n')
+    fparam.write('30. 0.05\n')
+    fparam.write('100. 50.\n') 
+    fparam.write('#[receiver]\n')
+    fparam.write('facqui.ascii\n')
+    fparam.write('0.00025\n')
+    fparam.close()
+
+def genacqui(x0, z0, dx, dz, n):
+    facqui = open('facqui.ascii', 'w')
+    for i in range(0, n):
+        xr = x0+float(i)*dx
+        zr = z0+float(i)*dz
+        facqui.write(str(xr)+' '+str(zr)+'\n')
+    facqui.close()
+    
 import numpy as np
 
 n1 = 401

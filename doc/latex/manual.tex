@@ -83,6 +83,26 @@
 % ----------------------------------------------------------------------
 \section{Theoretical background}
 
+\subsection{Equation of motion}
+\index{equation of motion}
+
+\subsection{Staggered grid}
+\index{staggered grid}
+
+\index{forward operator}
+\index{backward operator}
+\noindent Second order forward ($D^{+}$) and backward ($D^{-}$) operators:
+\begin{eqnarray}
+  D^{+}=f(i+1)-f(i) \nonumber \\
+  D^{-}=f(i)-f(i-1)
+\end{eqnarray}
+
+\noindent Fourth order forward ($D^{+}$) and backward ($D^{-}$) operators:
+\begin{eqnarray}
+  D^{+}=c1*[f(i+1)-f(i)]+c2*[f(i+2)-f(i-1)] \nonumber \\
+  D^{-}=c1*[f(i+1)-f(i)]+c2*[f(i+2)-f(i-1)]
+\end{eqnarray}
+
 % ----------------------------------------------------------------------
 % GETTING STARTED
 % ----------------------------------------------------------------------

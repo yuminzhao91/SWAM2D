@@ -19,6 +19,26 @@ module source
 
 contains
 
+  subroutine srcaddexp(ve, n1e, n2e, dt, dx, src, g)
+    !> \brief Add explosive source. 
+    integer:: n1e, n2e
+    real :: dt, dx, src
+    real :: ve(n1e, n2e), g(n1e, n2e)
+
+    ve(:, :) = ve(:, :)+(dt/dx)*g(:, :)*src
+    
+  end subroutine srcaddexp
+
+  subroutine srcaddforce(ve, n1e, n2e, dt, dx, src, g)
+    !> \brief Add vertical or horizontal force source.
+    integer:: i1, i2, n1e, n2e
+    real :: dt, dx, src
+    real :: ve(n1e, n2e), g(n1e, n2e)
+
+    ve(:, :) = ve(:, :)+(dt*dt/dx)*g(:, :)*src
+    
+  end subroutine srcaddforce
+  
   subroutine srcindex(xs, zs, npml, h, is1, is2)
     
     integer :: npml, is1, is2
