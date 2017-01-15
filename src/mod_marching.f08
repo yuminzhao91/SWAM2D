@@ -99,6 +99,7 @@ contains
 
     do it=1,nt
        call cpu_time(start)
+
        !# UX
 
        call dxbackward(txx, n1e, n2e, d2)
@@ -132,7 +133,7 @@ contains
        if(isurf == 1)then
           uz(1:nsp,:) = 0.
        end if
-
+       
        !# TXX -- TZZ
        call dxforward(ux, n1e, n2e, d2)
        call dzbackward(uz, n1e, n2e, d1)

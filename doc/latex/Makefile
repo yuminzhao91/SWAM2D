@@ -10,7 +10,7 @@ $(NAME).pdf:
 %.dvi : %.tex
 	latex ${NAME}
 	bibtex ${NAME}
-	makeindex ${NAME}
+	makeindex -s ${NAME}.ist ${NAME}
 	latex ${NAME}
 	latex ${NAME}
 
