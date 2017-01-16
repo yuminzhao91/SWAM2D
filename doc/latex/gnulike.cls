@@ -21,7 +21,7 @@
 %%    www.ctan.org
 %%
 \NeedsTeXFormat{LaTeX2e}[1996/12/01]
-\ProvidesClass{smanual}[2017/01/10 v1.0]
+\ProvidesClass{gnulike}[2017/01/10 v1.0]
 %%
 %% Pass all options directly to 'article'
 %%
@@ -30,7 +30,7 @@
 %%
 %% prefered fontsize, papersize, and type
 %%
-\LoadClass[oneside,11pt,a4paper]{article}
+\LoadClass[oneside,11pt,a4paper]{report}
 %%
 %% prefered fonts: Times New Roman becomes the standard font (text)
 %%
@@ -72,16 +72,40 @@
 %%
 %% set header and footer
 %%
-%\RequirePackage{fancyhdr}
+\RequirePackage{fancyhdr}
 \RequirePackage{graphicx}
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\thepage}
+\lhead{\leftmark}
+%\rfoot{Page \thepage}
 %\pagestyle{fancy} % load package
 %\fancyhf{} % clear styles
-%\fancyhead[R]{\includegraphics[scale=0.75]{cls/vibris_logoh.eps}} % input logo top right, even and odd side
+%\fancyhead{test} % input logo top right, even and odd side
 %\fancyfoot[C]{\vspace{-1pt}\fontsize{10}{10}\selectfont{%
 %\color{vibrisblue2}VIBRIS Project -- Intermediate Report\\
 %Physical and Numerical Experiments -- Damien Pageot
 %}} % footnote
-%\renewcommand{\headrulewidth}{0pt} % no line in header
+\renewcommand{\headrulewidth}{0pt} % no line in header
+
+\fancypagestyle{plain}{%
+  \fancyhf{}%
+  \rhead{\thepage}
+  \lhead{\nouppercase{\leftmark}}
+  %\fancyfoot[C]{\thepage\ of \pageref{LastPage}}%
+  %\renewcommand{\headrulewidth}{0pt}% Line at the header invisible
+  %\renewcommand{\footrulewidth}{0.4pt}% Line at the footer visible
+}
+
+\fancypagestyle{contents}{%
+  \fancyhf{}%
+  \rhead{}
+  \lhead{}
+  %\fancyfoot[C]{\thepage\ of \pageref{LastPage}}%
+  %\renewcommand{\headrulewidth}{0pt}% Line at the header invisible
+  %\renewcommand{\footrulewidth}{0.4pt}% Line at the footer visible
+}
+
 %\renewcommand{\footrulewidth}{0.4pt} % add line in footnote
 %\pagenumbering{gobble} % define page numbering
 %%

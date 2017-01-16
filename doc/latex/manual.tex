@@ -1,10 +1,11 @@
-\documentclass{smanual}
+\documentclass{gnulike}
 \usepackage{natbib}
 \usepackage{graphics}
 \usepackage{chngcntr}
 \usepackage{sectsty}
 \usepackage{rotating}
 \usepackage{emptypage}
+\usepackage[titletoc]{appendix}
 
 \let\leqslant=\leq
 
@@ -37,6 +38,9 @@
 
 \newcommand{\subtitle}{FDPSV}
 
+\titleformat{\chapter}[hang] 
+{\normalfont\huge\bfseries}{\thechapter}{0.5em}{} 
+\titlespacing*{\chapter}{0pt}{-20pt}{20pt}
 
 \usepackage{makeidx}
 \makeindex
@@ -66,32 +70,52 @@
   \vskip 1.0cm
 \end{titlepage}
 
-\tableofcontents
-\newpage
+% ----------------------------------------------------------------------
+% MANUAL LICENSE
+% ----------------------------------------------------------------------
+\null\vfill
+\pagenumbering{gobble}
+\noindent Copyright \copyright\ 2016-2017 Damien Pageot.\\
 
-\thispagestyle{empty}
+\noindent Permission is granted to copy, distribute and/or modify this document under the terms of the GNU Free Documentation License, Version 1.3 or any later version published by the Free Software Foundation; with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts. A copy of the license is included in the section entitled "GNU Free Documentation License".
 \clearpage\newpage
 
 % ----------------------------------------------------------------------
+% TABLE OF CONTENTS
+% ----------------------------------------------------------------------
+\pagenumbering{roman}
+\tableofcontents
+\thispagestyle{empty}
+\clearpage\newpage
+
+\pagenumbering{arabic}
+% ----------------------------------------------------------------------
 % INTRODUCTION
 % ----------------------------------------------------------------------
-\section{Introduction}
+\chapter{Introduction}
 \index{Introduction}
 
 % ----------------------------------------------------------------------
 % THEORETICAL BACKGROUND
 % ----------------------------------------------------------------------
-\section{Theoretical background}
+\chapter{Theoretical background}
 
-\subsection{Equation of motion}
+\section{Equation of motion}
 \index{equation of motion}
 
-\subsection{Staggered grid}
+\section{Staggered grid}
 \index{staggered grid}
 
+\cite{virieux1986psv,levander1988fourth}
+
+\begin{figure}[!ht]
+  \centering
+  \includegraphics[width=8cm]{fig/staggered.eps}
+\end{figure}
+
+\noindent Second order forward ($D^{+}$) and backward ($D^{-}$) operators:
 \index{forward operator}
 \index{backward operator}
-\noindent Second order forward ($D^{+}$) and backward ($D^{-}$) operators:
 \begin{eqnarray}
   D^{+}=f(i+1)-f(i) \nonumber \\
   D^{-}=f(i)-f(i-1)
@@ -99,16 +123,29 @@
 
 \noindent Fourth order forward ($D^{+}$) and backward ($D^{-}$) operators:
 \begin{eqnarray}
-  D^{+}=c1*[f(i+1)-f(i)]+c2*[f(i+2)-f(i-1)] \nonumber \\
-  D^{-}=c1*[f(i+1)-f(i)]+c2*[f(i+2)-f(i-1)]
+  D^{+}=c_{1}[f(i+1)-f(i)]+c_{2}[f(i+2)-f(i-1)] \nonumber \\
+  D^{-}=c_{1}[f(i)-f(i-1)]+c_{2}[f(i+1)-f(i-2)]
 \end{eqnarray}
+
+\index{Lam\'e parameters}
+\begin{eqnarray}
+  \bar{\mu}(i+\frac{1}{2}, j+\frac{1}{2})=\frac{1}{4}(\mu(i,j)+\mu(i+1,j)+\mu(i,j+1)+\mu(i+1,j+1) \\
+  \rho_{x}(i,j+\frac{1}{2}) = \frac{1}{2}(\rho (i,j+1)+\rho(i,j)) \\
+  \rho_{z}(i+\frac{1}{2},j) = \frac{1}{2}(\rho (i+1,j)+\rho(i,j))
+\end{eqnarray}
+
+\section{Initial and boundary conditions}
+\index{absorbing boundary condition}
+\index{free surface condition}
+
+\cite{berenger1994perfectly}
 
 % ----------------------------------------------------------------------
 % GETTING STARTED
 % ----------------------------------------------------------------------
-\section{Getting started}
+\chapter{Getting started}
 
-\subsection{Requirements}
+\section{Requirements}
 
 \noindent For FDPSV program:
 \begin{itemize}
@@ -128,32 +165,40 @@
 \end{itemize}
 
 \subsection{Compilation}
-
 \addbash{make}
 
 % ----------------------------------------------------------------------
-% Input parameters and files
+% INPUT PARAMETERS AND FILES
 % ----------------------------------------------------------------------
 \section{Input parameters and files}
+\index{input parameters}
+\index{input files}
 
 % ----------------------------------------------------------------------
 % NUMERICAL EXAMPLES
 % ----------------------------------------------------------------------
-\section{Numerical examples}
+\chapter{Numerical examples}
 
+\begin{appendices}
 % ----------------------------------------------------------------------
-% License
+% APPENDICES
 % ----------------------------------------------------------------------
-%\section*{License}
-%\input{gpl-3.0}
+%\appendix
+%\addappheadtotoc
+%\chapter{GNU Free Documentation License}
+\input{fdl-1.3}
 
+\end{appendices}
+  
 % ----------------------------------------------------------------------
 % References
 % ----------------------------------------------------------------------
 
-\cite{aki2002quantitative}
 \bibliography{references}
 
+\clearpage
+\newpage
+\thispagestyle{empty}
 \printindex
 
 \end{document}
