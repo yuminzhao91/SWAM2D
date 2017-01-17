@@ -20,7 +20,7 @@ contains
   subroutine sponges(nsp, fac, h, spg)
     
     integer :: i, nsp
-    real :: fac, h, spg(3, nsp+1)
+    real :: fac, h, spg(3, nsp+1), q
 
     fac = acos(fac)/(float(nsp)*h)
     
@@ -30,6 +30,10 @@ contains
        spg(1, i) = cos(fac*(float(nsp-i+1)*h))
        spg(2, i) = cos(fac*(float(nsp-i+1)*h-h/2.))
        spg(3, i) = cos(fac*(float(nsp-i+1)*h+h/2.))
+       !q = float(i-1)*h
+       !spg(1, i) = (0.5*5*(300./(float(nsp+1)*h))*(q/(float(nsp+1)*h))*(q/(float(nsp+1)*h)))
+       !spg(2, i) = (0.5*5*(300./(float(nsp+1)*h))*(q/(float(nsp+1)*h))*(q/(float(nsp+1)*h)))
+       !spg(3, i) = (0.5*5*(300./(float(nsp+1)*h))*(q/(float(nsp+1)*h))*(q/(float(nsp+1)*h)))
     end do
     
     spg(2, nsp) = 1.
