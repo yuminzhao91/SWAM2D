@@ -101,7 +101,7 @@ contains
        call cpu_time(start)
 
        !# UX
-
+       
        call dxbackward(txx, n1e, n2e, d2)
        call dzbackward(txz, n1e, n2e, d1)
 

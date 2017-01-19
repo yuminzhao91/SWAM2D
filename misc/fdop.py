@@ -15,7 +15,7 @@ for i in range(0,n):
     f[i] = np.sin(x)
     g[i] = np.cos(x)
 
-for i in range(0,n-1):
+for i in range(1,n-1):
     h1[i] = (f[i]-f[i-1])/dx
     h2[i] = (f[i+1]-f[i])/dx
     

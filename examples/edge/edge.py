@@ -2,10 +2,13 @@
 
 """
 Generate input parameter file, acquisition file and direct access binary
-model files to run with FDPSV.
+model files to run with SWAM2D.
 """
 
 def genparam():
+    """
+    Generate input parameter file for SWAM2D.
+    """
     fparam = open('param.input', 'w')
     fparam.write('#[run]\n')
     fparam.write('test\n')
@@ -25,6 +28,9 @@ def genparam():
     fparam.close()
 
 def genacqui(x0, z0, dx, dz, n):
+    """
+    Genrate acquisition file for SWAM2D.
+    """
     facqui = open('facqui.ascii', 'w')
     for i in range(0, n):
         xr = x0+float(i)*dx
