@@ -17,6 +17,48 @@ module boundaries
 
 contains
 
+  subroutine pmlmod(vpe, n1e, n2e, h, npml, apml, ppml, &
+       pmlx0, pmlx1, pmlz0, pmlz1)
+
+    integer :: n1e, n2e, npml, ppml, i
+    real :: apml, val0, val1, val2
+    real, dimension(n1e, n2e) :: vpe, pmlx0, pmlx1, pmlz0, pmlz1
+
+    real :: r, vpmax, d0, l, h
+    
+    ! >> Initialize pml arrays
+    pmlx0(:, :) = 0.
+    pmlx1(:, :) = 0.
+    pmlz0(:, :) = 0.
+    pmlz1(:, :) = 0.
+
+    r = 0.001
+    vpmax = maxval(vpe)
+    l = float(npml-1)*h
+    d0 = apml*vpmax*log(1./r)/(2*l)
+    
+    do i=1,npml+1
+       val0 = float(npml-i+1)*h
+       val1 = float(npml-i+1)*h-(h/2.)
+       val2 = float(npml-i+1)*h+(h/2.)
+       pmlz0(i, :) = d0*(val0/l)**2
+       pmlz0(n1e+1-i,:) = d0*(val0/l)**ppml
+       pmlz1(i, :) = d0*(val1/l)**2
+       pmlz1(n1e+1-i, :) = d0*(val2/l)**ppml
+       pmlx0(:, i) = d0*(val0/l)**2
+       pmlx0(:, n2e+1-i) = d0*(val0/l)**ppml
+       pmlx1(:, i) = d0*(val1/l)**2
+       pmlx1(:, n2e+1-i) = d0*(val2/l)**ppml
+    enddo
+
+    pmlx0(:, :) = pmlx0(:, :)/2.
+    pmlx1(:, :) = pmlx1(:, :)/2.
+    pmlz0(:, :) = pmlz0(:, :)/2.
+    pmlz1(:, :) = pmlz1(:, :)/2.
+    
+  end subroutine pmlmod
+
+  
   subroutine sponges(nsp, fac, h, spg)
     
     integer :: i, nsp

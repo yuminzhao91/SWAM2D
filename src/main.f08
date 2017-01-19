@@ -15,12 +15,16 @@ program main
   integer :: nt, nts
   integer :: nrec
   real    :: tmax, t0, f0, sigma, xs, zs
-  real, allocatable :: tsrc(:), gsrc(:, :), spg(:,:)
+  real, allocatable :: tsrc(:), gsrc(:, :)
+  real, allocatable :: pmlx0(:, :), pmlx1(:, :)
+  real, allocatable :: pmlz0(:, :), pmlz1(:, :)
+  real, allocatable :: spg(:,:)
   real, allocatable :: recx(:, :), recz(:, :)
   integer, allocatable :: recp(:, :)
 
   integer :: n1, n2, isurf, npml, srctype, srcfunc
   real    :: dt, h, dts, apml
+  integer :: ppml
   character(len=80) :: frun
   character(len=80) :: fvp, fvs, fro, facqui
 
@@ -28,7 +32,7 @@ program main
 
   !# >> Read input parameter file
   call parread(frun, tmax, dt, fvp, fvs, fro, n1, n2, &
-       h, isurf, npml, apml, srctype, srcfunc, sigma, &
+       h, isurf, npml, apml, ppml, srctype, srcfunc, sigma, &
        f0, t0, xs, zs, facqui, dts)
   
   !# >> Get source position index on extend grid
@@ -73,6 +77,11 @@ program main
   !# >> Stability condition
   write(*, *) 'Courant::', dt*maxval(tmod%vp)/h
 
+  allocate(pmlx0(n1e, n2e), pmlx1(n1e, n2e))
+  allocate(pmlz0(n1e, n2e), pmlz1(n1e, n2e))
+  call pmlmod(tmod%vpe, n1e, n2e, h, npml, apml, ppml, &
+       pmlx0, pmlx1, pmlz0, pmlz1)
+  
   !# >> Deallocate model matrices
   deallocate(tmod%vp, tmod%vs, tmod%ro)
   deallocate(tmod%vpe, tmod%vse, tmod%roe)
@@ -88,9 +97,11 @@ program main
 
   write(*, * ) 'SPONGES'
   call sponges(npml, apml, h, spg)
-
+  
   write(*, * ) 'EVOLUTION'
-  call evolution(n1e, n2e, npml, h, dt, dts, nt, nts, nrec, srctype, tsrc, gsrc, spg, recx, recz, recp, tmod, isurf)
+  call evolution(n1e, n2e, npml, h, dt, dts, nt, nts, nrec, srctype, tsrc, &
+       gsrc, spg, recx, recz, recp, tmod, isurf, &
+       pmlx0, pmlx1, pmlz0, pmlz1)
 
   !# write seismos
   write(*, * ) nts, nrec
@@ -109,4 +120,6 @@ program main
   deallocate(tmod%mu0, tmod%mue)
   deallocate(tmod%lb0, tmod%lbmu)
 
+  deallocate(pmlx0, pmlx1, pmlz0, pmlz1)
+  
 end program main

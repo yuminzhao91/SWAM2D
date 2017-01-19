@@ -49,7 +49,9 @@ module marching
 
 contains
   
-  subroutine evolution(n1e, n2e, nsp, h,  dt, dts, nt, nts, nrec, srctype, tsrc, gsrc, spg, recx, recz, recp, tmod, isurf)
+  subroutine evolution(n1e, n2e, nsp, h,  dt, dts, nt, nts, nrec, srctype, &
+       tsrc, gsrc, spg, recx, recz, recp, tmod, isurf, &
+       pmlx0, pmlx1, pmlz0, pmlz1)
 
     type(typemod) :: tmod
 
@@ -73,39 +75,8 @@ contains
     character(len=80) :: snapfile
 
     ! >> ADDING PML TEMP. IN MARCHING MOD
-    integer :: i
-    real :: d0, cp, r, val0, val1, val2, l
-    real, allocatable :: pmlx0(:, :), pmlx1(:, :), pmlz0(:, :), pmlz1(:, :)
-    allocate(pmlx0(n1e, n2e), pmlx1(n1e, n2e))
-    allocate(pmlz0(n1e, n2e), pmlz1(n1e, n2e)) 
+    real, dimension(n1e, n2e) :: pmlx0, pmlx1, pmlz0, pmlz1
 
-    r = 0.001
-    cp = 600.
-    l = float(nsp-1)*h
-    d0 = 3.*cp*log(1./r)/(2*l)
-    pmlx0(:, :) = 0.
-    pmlx1(:, :) = 0.
-    pmlz0(:, :) = 0.
-    pmlz1(:, :) = 0.
-    
-    do i=1,nsp+1
-       val0 = float(nsp-i+1)*h
-       val1 = float(nsp-i+1)*h-(h/2.)
-       val2 = float(nsp-i+1)*h+(h/2.)
-       pmlz0(i, :) = d0*(val0/l)**2
-       pmlz0(n1e+1-i,:) = d0*(val0/l)**2
-       pmlz1(i, :) = d0*(val1/l)**2
-       pmlz1(n1e+1-i, :) = d0*(val2/l)**2
-       pmlx0(:, i) = d0*(val0/l)**2
-       pmlx0(:, n2e+1-i) = d0*(val0/l)**2
-       pmlx1(:, i) = d0*(val1/l)**2
-       pmlx1(:, n2e+1-i) = d0*(val2/l)**2
-    enddo
-
-    pmlx0(:, :) = pmlx0(:, :)/2.
-    pmlx1(:, :) = pmlx1(:, :)/2.
-    pmlz0(:, :) = pmlz0(:, :)/2.
-    pmlz1(:, :) = pmlz1(:, :)/2.
 
     open(901, file='test_pmlz0.bin', access='direct', recl=n1e*n2e*4)
     write(901, rec=1) pmlz0
@@ -308,8 +279,6 @@ contains
     deallocate(txxx, txxz)
     deallocate(tzzx, tzzz)
     deallocate(txzx, txzz)
-
-    deallocate(pmlx0, pmlx1, pmlz0, pmlz1)
 
   end subroutine evolution
 

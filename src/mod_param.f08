@@ -17,10 +17,10 @@ module param
 contains
 
   subroutine parread(frun, tmax, dt, fvp, fvs, fro, n1, n2, h, &
-       isurf, npml, apml, srctype, srcfunc, sigma, f0, t0, &
+       isurf, npml, apml, ppml, srctype, srcfunc, sigma, f0, t0, &
        xs, zs, facqui, dts)
 
-    integer :: n1, n2, isurf, npml, srctype, srcfunc
+    integer :: n1, n2, isurf, npml, srctype, srcfunc, ppml
     real :: tmax, dt, h, apml, sigma, f0, t0, xs, zs, dts
     character(len=*) :: frun, fvp, fvs, fro, facqui
 
@@ -32,7 +32,7 @@ contains
     read(101, *) fvp, fvs, fro
     read(101, *) n1, n2, h
     read(101, *) !#[boundaries]
-    read(101, *) isurf, npml, apml
+    read(101, *) isurf, npml, apml, ppml
     read(101, *) ! #[source]
     read(101, *) srctype, srcfunc, sigma
     read(101, *) f0, t0
