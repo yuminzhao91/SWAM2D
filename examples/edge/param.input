@@ -5,7 +5,7 @@ test
 fvp.bin fvs.bin fro.bin
 401 401 0.5
 #[boundaries]
-0 20 0.7
+1 20 0.7
 #[source]
 1 2 2
 30. 0.05

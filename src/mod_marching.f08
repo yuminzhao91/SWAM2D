@@ -146,61 +146,6 @@ contains
     do it=1,nt
        call cpu_time(start)
 
-       !# UX
-       
-       call dxforward(txx, n1e, n2e, d2)
-       call dzbackward(txz, n1e, n2e, d1)
-
-       !call addpmlx(n1e, n2e, nsp, spg(3,:), spg(3,:), uxx)
-       !call addpmlz(n1e, n2e, nsp, spg(1,:), spg(1,:), uxz, isurf)
-
-       uxx(:, :) = (((1./dt-pmlx1(:,:))*uxx(:, :)+(1./h)*tmod%bux(:, :)*d2(:, :))/(1./dt+pmlx1(:, :)))
-       uxz(:, :) = (((1./dt-pmlz0(:,:))*uxz(:, :)+(1./h)*tmod%bux(:, :)*d1(:, :))/(1./dt+pmlz0(:, :))) !uxz(:, :)+dth*tmod%bux(:, :)*d1(:, :)
-       ux(:, :) = uxx(:, :)+uxz(:, :)
-       if(isurf == 1)then
-          ux(1:nsp,:) = 0.
-       end if
-       
-       !# UZ
-       call dxbackward(txz, n1e, n2e, d2)
-       call dzforward(tzz, n1e, n2e, d1)
-
-       !call addpmlx(n1e, n2e, nsp, spg(1,:), spg(1,:), uzx)
-       !call addpmlz(n1e, n2e, nsp, spg(3,:), spg(3,:), uzz, isurf)
-
-       if(srctype== 2)then
-          uzx(:, :) = (((1./dt-pmlx0(:,:))*uzx(:, :)+(1./h)*tmod%buz(:, :)*d2(:, :) &
-               +(tsrc(it)*gsrc(:,:))*dt/(h*h))/(1./dt+pmlx0(:, :)))
-       else
-          uzx(:, :) = (((1./dt-pmlx0(:,:))*uzx(:, :)+(1./h)*tmod%buz(:, :)*d2(:, :))/(1./dt+pmlx0(:, :)))
-       end if
-       uzz(:, :) = (((1./dt-pmlz1(:,:))*uzz(:, :)+(1./h)*tmod%buz(:, :)*d1(:, :))/(1./dt+pmlz1(:, :)))
-
-       uz(:, :) = uzx(:, :)+uzz(:, :)
-       if(isurf == 1)then
-          uz(1:nsp,:) = 0.
-       end if
-       
-       uxx(1, :) = 0.
-       uxx(n1e, :)= 0.
-       uxx(:, 1) = 0.
-       uxx(:, n2e)= 0.
-
-       uxz(1, :) = 0.
-       uxz(n1e, :)= 0.
-       uxz(:, 1) = 0.
-       uxz(:, n2e)= 0.
-
-       uzx(1, :) = 0.
-       uzx(n1e, :)= 0.
-       uzx(:, 1) = 0.
-       uzx(:, n2e)= 0.
-
-       uzz(1, :) = 0.
-       uzz(n1e, :)= 0.
-       uzz(:, 1) = 0.
-       uzz(:, n2e)= 0.
-
        !# TXX -- TZZ
        call dxbackward(ux, n1e, n2e, d2)
        call dzbackward(uz, n1e, n2e, d1)
@@ -259,6 +204,62 @@ contains
           txzz(nsp-1,:) = -txzz(nsp+3,:)
        end if
        txz(:, :) = txzx(:, :)+txzz(:, :) 
+
+       !# UX
+       
+       call dxforward(txx, n1e, n2e, d2)
+       call dzbackward(txz, n1e, n2e, d1)
+
+       !call addpmlx(n1e, n2e, nsp, spg(3,:), spg(3,:), uxx)
+       !call addpmlz(n1e, n2e, nsp, spg(1,:), spg(1,:), uxz, isurf)
+
+       uxx(:, :) = (((1./dt-pmlx1(:,:))*uxx(:, :)+(1./h)*tmod%bux(:, :)*d2(:, :))/(1./dt+pmlx1(:, :)))
+       uxz(:, :) = (((1./dt-pmlz0(:,:))*uxz(:, :)+(1./h)*tmod%bux(:, :)*d1(:, :))/(1./dt+pmlz0(:, :))) !uxz(:, :)+dth*tmod%bux(:, :)*d1(:, :)
+       ux(:, :) = uxx(:, :)+uxz(:, :)
+       if(isurf == 1)then
+          ux(1:nsp,:) = 0.
+       end if
+       
+       !# UZ
+       call dxbackward(txz, n1e, n2e, d2)
+       call dzforward(tzz, n1e, n2e, d1)
+
+       !call addpmlx(n1e, n2e, nsp, spg(1,:), spg(1,:), uzx)
+       !call addpmlz(n1e, n2e, nsp, spg(3,:), spg(3,:), uzz, isurf)
+
+       if(srctype== 2)then
+          uzx(:, :) = (((1./dt-pmlx0(:,:))*uzx(:, :)+(1./h)*tmod%buz(:, :)*d2(:, :) &
+               +(tsrc(it)*gsrc(:,:))*dt/(h*h))/(1./dt+pmlx0(:, :)))
+       else
+          uzx(:, :) = (((1./dt-pmlx0(:,:))*uzx(:, :)+(1./h)*tmod%buz(:, :)*d2(:, :))/(1./dt+pmlx0(:, :)))
+       end if
+       uzz(:, :) = (((1./dt-pmlz1(:,:))*uzz(:, :)+(1./h)*tmod%buz(:, :)*d1(:, :))/(1./dt+pmlz1(:, :)))
+
+       uz(:, :) = uzx(:, :)+uzz(:, :)
+       if(isurf == 1)then
+          uz(1:nsp,:) = 0.
+       end if
+       
+       ! implement Dirichlet boundary conditions on the four edges of the grid
+       uxx(1, :) = 0.
+       uxx(n1e, :)= 0.
+       uxx(:, 1) = 0.
+       uxx(:, n2e)= 0.
+
+       uxz(1, :) = 0.
+       uxz(n1e, :)= 0.
+       uxz(:, 1) = 0.
+       uxz(:, n2e)= 0.
+
+       uzx(1, :) = 0.
+       uzx(n1e, :)= 0.
+       uzx(:, 1) = 0.
+       uzx(:, n2e)= 0.
+
+       uzz(1, :) = 0.
+       uzz(n1e, :)= 0.
+       uzz(:, 1) = 0.
+       uzz(:, n2e)= 0.
 
        call cpu_time(finish)
        full = full+(finish-start)
