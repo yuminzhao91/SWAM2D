@@ -1,2 +1,2 @@
-# FDPSV
-2D finite-difference time-domain modeling code for P-Sv wave propagation
+# SWAM2D
+Seismic WAve Modeling in 2D

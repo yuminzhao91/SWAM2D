@@ -1,0 +1,13 @@
+\chapter{Finite-difference equations}
+
+\begin{equation}
+  E(i,j)=\lambda(i,j)+2\mu (i,j)
+\end{equation}
+
+\begin{eqnarray}
+  D_{t}^{+}v_{x}^{t}({\scriptstyle i,j+1/2,l-1/2}) = \rho_{x}^{-1}({\scriptstyle i,j}) [D_{x}^{+}\tau_{xx}({\scriptstyle i,j,l})+D_{z}^{-}\tau_{xz}({\scriptstyle i+1/2,j,l})] \\
+  D_{t}^{+}v_{z}^{t}({\scriptstyle i+1/2,j,l-1/2}) = \rho_{z}^{-1}({\scriptstyle i,j}) [D_{x}^{-}\tau_{xz}({\scriptstyle i+1/2,j+1/2,l})+D_{z}^{+}\tau_{zz}({\scriptstyle i,j,l})] \\
+  D_{t}^{+}\tau_{xx}({\scriptstyle i,j,l}) = E({\scriptstyle i,j}) D_{x}^{-}v_{x}({\scriptstyle i,j+1/2,l+1/2})+\mu({\scriptstyle i,j}) D_{z}^{-}v_{z}({\scriptstyle i+1/2,j,l+1/2}) \\
+  D_{t}^{+}\tau_{zz}({\scriptstyle i,j,l}) = \mu({\scriptstyle i,j}) D_{x}^{-}v_{x}({\scriptstyle i,j+1/2,l+1/2})+ E({\scriptstyle i,j}) D_{z}^{-}v_{z}({\scriptstyle i+1/2,j,l+1/2})\\
+  D_{t}^{+}\tau_{xz}({\scriptstyle i+1/2,j+1/2,l}) = \bar{\mu}({\scriptstyle i+1/2,j+1/2})[D_{z}^{+}v_{x}({\scriptstyle i,j+1/2,l+1/2}) +D_{x}^{+}v_{z}({\scriptstyle i+1/2,j,l+1/2})]  
+\end{eqnarray}

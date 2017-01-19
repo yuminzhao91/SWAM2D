@@ -13,6 +13,8 @@
 %\newcommand{\bialt}{\textit{BiAlt} }
 %\newcommand{\cmnt}[1]{}
 
+\DeclareMathSizes{10}{10}{10}{10}
+
 \definecolor{light-gray}{gray}{0.95}
 \definecolor{bashgray}{RGB}{209,214,217}
 \newcommand{\addbash}[1]{
@@ -33,6 +35,7 @@
 \definecolor{vibrisblue1}{RGB}{90,151,190}
 \definecolor{vibrisblue2}{RGB}{25,96,177}
 
+\newcommand{\indice}[1]{\scriptsize{#1}}
 \newcommand{\subtitle}{FDPSV}
 
 \titleformat{\chapter}[hang] 
@@ -99,6 +102,14 @@
 
 \noindent test $\Sigma$, $\Xi$, $\mathsf{T}$
 
+\begin{eqnarray}
+  \frac{\partial v_{x}}{\partial t} = \rho^{{\scriptscriptstyle-1}} \left( \frac{\partial \tau_{xx}}{\partial x} + \frac{\partial \tau_{xz}}{\partial z} \right) \\
+  \frac{\partial v_{z}}{\partial t} = \rho^{{\scriptscriptstyle -1}} \left( \frac{\partial \tau_{xz}}{\partial x} + \frac{\partial \tau_{zz}}{\partial z} \right) \\
+  \frac{\partial \tau_{xx}}{\partial t} = (\lambda+2\mu)\frac{\partial v_{x}}{\partial x} + \lambda \frac{\partial v_{z}}{\partial z} \\
+  \frac{\partial \tau_{zz}}{\partial t} = (\lambda+2\mu)\frac{\partial v_{z}}{\partial z} + \lambda \frac{\partial v_{x}}{\partial x} \\
+  \frac{\partial \tau_{xz}}{\partial t} = \mu \left( \frac{\partial v_{x}}{\partial z} + \frac{\partial v_{z}}{\partial x } \right)
+\end{eqnarray}
+
 \section{Equation of motion}
 \index{equation of motion}
 
@@ -109,7 +120,9 @@
 
 \begin{figure}[!ht]
   \centering
-  \includegraphics[width=8cm]{fig/staggered.eps}
+  \includegraphics[width=0.9\textwidth]{fig/staggered.eps}
+  \caption{Staggered finite-difference grid and spatial stencils for (a) the velocity update and (b) the stress update. After \cite{levander1988fourth} with velocity-stress position switch proposed by \cite{bohlen2006accuracy}.}
+  \label{fig:staggered-grid}
 \end{figure}
 
 \noindent Second order forward ($D^{+}$) and backward ($D^{-}$) operators:
@@ -149,6 +162,9 @@
 d = d_{0} \left( \frac{q}{L_{PML}} \right) ^{n} \\
 d_{0} = 3c_{p} \frac{log(1/R)}{2L_{PML}}
 \end{eqnarray}
+
+\subsection{Free surface}
+\index{free surface}
 
 % ----------------------------------------------------------------------
 % GETTING STARTED
@@ -193,8 +209,10 @@ d_{0} = 3c_{p} \frac{log(1/R)}{2L_{PML}}
 % ----------------------------------------------------------------------
 % APPENDICES
 % ----------------------------------------------------------------------
-%\appendix
-%\addappheadtotoc
+%\chapter{Finite-difference equations}
+\index{finite-difference equations}
+\input{fdequation}
+
 %\chapter{GNU Free Documentation License}
 \index{GNU FDL}  
 \input{fdl-1.3}

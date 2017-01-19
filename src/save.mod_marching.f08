@@ -72,52 +72,6 @@ contains
 
     character(len=80) :: snapfile
 
-    ! >> ADDING PML TEMP. IN MARCHING MOD
-    integer :: i
-    real :: d0, cp, r, val0, val1, val2, l
-    real, allocatable :: pmlx0(:, :), pmlx1(:, :), pmlz0(:, :), pmlz1(:, :)
-    allocate(pmlx0(n1e, n2e), pmlx1(n1e, n2e))
-    allocate(pmlz0(n1e, n2e), pmlz1(n1e, n2e)) 
-
-    r = 0.001
-    cp = 600.
-    l = float(nsp-1)*h
-    d0 = 3.*cp*log(1./r)/(2*l)
-    pmlx0(:, :) = 0.
-    pmlx1(:, :) = 0.
-    pmlz0(:, :) = 0.
-    pmlz1(:, :) = 0.
-    
-    do i=1,nsp+1
-       val0 = float(nsp-i+1)*h
-       val1 = float(nsp-i+1)*h-(h/2.)
-       val2 = float(nsp-i+1)*h+(h/2.)
-       pmlz0(i, :) = d0*(val0/l)**2
-       pmlz0(n1e+1-i,:) = d0*(val0/l)**2
-       pmlz1(i, :) = d0*(val1/l)**2
-       pmlz1(n1e+1-i, :) = d0*(val2/l)**2
-       pmlx0(:, i) = d0*(val0/l)**2
-       pmlx0(:, n2e+1-i) = d0*(val0/l)**2
-       pmlx1(:, i) = d0*(val1/l)**2
-       pmlx1(:, n2e+1-i) = d0*(val2/l)**2
-    enddo
-
-    pmlx0(:, :) = pmlx0(:, :)/2.
-    pmlx1(:, :) = pmlx1(:, :)/2.
-    pmlz0(:, :) = pmlz0(:, :)/2.
-    pmlz1(:, :) = pmlz1(:, :)/2.
-
-    open(901, file='test_pmlz0.bin', access='direct', recl=n1e*n2e*4)
-    write(901, rec=1) pmlz0
-    close(901)
-
-    open(902, file='test_pmlz1.bin', access='direct', recl=n1e*n2e*4)
-    write(902, rec=1) pmlz1
-    close(902)
-
-    ! >> END PML
-
-
     dth = dt/h
     
     write(*, *) 'EVOLUTION ALLOCATION'
@@ -151,11 +105,11 @@ contains
        call dxforward(txx, n1e, n2e, d2)
        call dzbackward(txz, n1e, n2e, d1)
 
-       !call addpmlx(n1e, n2e, nsp, spg(3,:), spg(3,:), uxx)
-       !call addpmlz(n1e, n2e, nsp, spg(1,:), spg(1,:), uxz, isurf)
+       call addpmlx(n1e, n2e, nsp, spg(3,:), spg(3,:), uxx)
+       call addpmlz(n1e, n2e, nsp, spg(1,:), spg(1,:), uxz, isurf)
 
-       uxx(:, :) = (((1./dt-pmlx1(:,:))*uxx(:, :)+(1./h)*tmod%bux(:, :)*d2(:, :))/(1./dt+pmlx1(:, :)))
-       uxz(:, :) = (((1./dt-pmlz0(:,:))*uxz(:, :)+(1./h)*tmod%bux(:, :)*d1(:, :))/(1./dt+pmlz0(:, :))) !uxz(:, :)+dth*tmod%bux(:, :)*d1(:, :)
+       uxx(:, :) = uxx(:, :)+dth*tmod%bux(:, :)*d2(:, :)
+       uxz(:, :) = uxz(:, :)+dth*tmod%bux(:, :)*d1(:, :)
        ux(:, :) = uxx(:, :)+uxz(:, :)
        if(isurf == 1)then
           ux(1:nsp,:) = 0.
@@ -165,72 +119,49 @@ contains
        call dxbackward(txz, n1e, n2e, d2)
        call dzforward(tzz, n1e, n2e, d1)
 
-       !call addpmlx(n1e, n2e, nsp, spg(1,:), spg(1,:), uzx)
-       !call addpmlz(n1e, n2e, nsp, spg(3,:), spg(3,:), uzz, isurf)
+       call addpmlx(n1e, n2e, nsp, spg(1,:), spg(1,:), uzx)
+       call addpmlz(n1e, n2e, nsp, spg(3,:), spg(3,:), uzz, isurf)
 
        if(srctype== 2)then
-          uzx(:, :) = (((1./dt-pmlx0(:,:))*uzx(:, :)+(1./h)*tmod%buz(:, :)*d2(:, :) &
-               +(tsrc(it)*gsrc(:,:))*dt/(h*h))/(1./dt+pmlx0(:, :)))
+          uzx(:, :) = uzx(:, :)+dth*tmod%buz(:, :)*d2(:, :)+(tsrc(it)*gsrc(:,:))*dt*dt/(h*h)
        else
-          uzx(:, :) = (((1./dt-pmlx0(:,:))*uzx(:, :)+(1./h)*tmod%buz(:, :)*d2(:, :))/(1./dt+pmlx0(:, :)))
+          uzx(:, :) = uzx(:, :)+dth*tmod%buz(:, :)*d2(:, :)
        end if
-       uzz(:, :) = (((1./dt-pmlz1(:,:))*uzz(:, :)+(1./h)*tmod%buz(:, :)*d1(:, :))/(1./dt+pmlz1(:, :)))
+       uzz(:, :) = uzz(:, :)+dth*tmod%buz(:, :)*d1(:, :)
 
        uz(:, :) = uzx(:, :)+uzz(:, :)
        if(isurf == 1)then
           uz(1:nsp,:) = 0.
        end if
        
-       uxx(1, :) = 0.
-       uxx(n1e, :)= 0.
-       uxx(:, 1) = 0.
-       uxx(:, n2e)= 0.
-
-       uxz(1, :) = 0.
-       uxz(n1e, :)= 0.
-       uxz(:, 1) = 0.
-       uxz(:, n2e)= 0.
-
-       uzx(1, :) = 0.
-       uzx(n1e, :)= 0.
-       uzx(:, 1) = 0.
-       uzx(:, n2e)= 0.
-
-       uzz(1, :) = 0.
-       uzz(n1e, :)= 0.
-       uzz(:, 1) = 0.
-       uzz(:, n2e)= 0.
-
        !# TXX -- TZZ
        call dxbackward(ux, n1e, n2e, d2)
        call dzbackward(uz, n1e, n2e, d1)
 
-       !call addpmlx(n1e, n2e, nsp, spg(1,:), spg(1,:), txxx)
-       !call addpmlz(n1e, n2e, nsp, spg(1,:), spg(1,:), txxz, isurf)
+       call addpmlx(n1e, n2e, nsp, spg(1,:), spg(1,:), txxx)
+       call addpmlz(n1e, n2e, nsp, spg(1,:), spg(1,:), txxz, isurf)
 
        if(srctype == 1)then
-          txxx(:, :) = (((1./dt-pmlx0(:,:))*txxx(:, :)+(1./h)*tmod%lbmu(:, :)*d2(:, :)&
-               +(tsrc(it)*gsrc(:,:))/(h*h))/(1./dt+pmlx0(:, :)))
+          txxx(:, :) = txxx(:, :)+dth*tmod%lbmu(:, :)*d2(:, :)+(tsrc(it)*gsrc(:,:))*dt/(h*h)
        else
-          txxx(:, :) = (((1./dt-pmlx0(:,:))*txxx(:, :)+(1./h)*tmod%lbmu(:, :)*d2(:, :))/(1./dt+pmlx0(:, :)))
+          txxx(:, :) = txxx(:, :)+dth*tmod%lbmu(:, :)*d2(:, :)
        end if
-       txxz(:, :) = (((1./dt-pmlz0(:,:))*txxz(:, :)+(1./h)*tmod%lb0(:, :)*d1(:, :))/(1./dt+pmlz0(:, :)))
+       txxz(:, :) = txxz(:, :)+dth*tmod%lb0(:, :)*d1(:, :)
 
        txx(:, :) = txxx(:, :) + txxz(:, :)
        if(isurf == 1)then
           txx(nsp+1, :) = txxx(nsp+1, :)
        end if
        
-       !call addpmlx(n1e, n2e, nsp, spg(1,:), spg(1,:), tzzx)
-       !call addpmlz(n1e, n2e, nsp, spg(1,:), spg(1,:), tzzz, isurf)
+       call addpmlx(n1e, n2e, nsp, spg(1,:), spg(1,:), tzzx)
+       call addpmlz(n1e, n2e, nsp, spg(1,:), spg(1,:), tzzz, isurf)
 
        if(srctype == 0 .or. srctype == 1)then
-          tzzx(:, :) = (((1./dt-pmlx0(:,:))*tzzx(:, :)+(1./h)*tmod%lb0(:, :)*d2(:, :)&
-               +(tsrc(it)*gsrc(:,:))/(h*h))/(1./dt+pmlx0(:, :)))
+          tzzx(:, :) = tzzx(:, :)+dth*tmod%lb0(:, :)*d2(:, :)+(tsrc(it)*gsrc(:,:))*dt/(h*h)
        else
-          tzzx(:, :) = (((1./dt-pmlx0(:,:))*tzzx(:, :)+(1./h)*tmod%lb0(:, :)*d2(:, :))/(1./dt+pmlx0(:, :)))
+          tzzx(:, :) = tzzx(:, :)+dth*tmod%lb0(:, :)*d2(:, :)
        end if
-       tzzz(:, :) = (((1./dt-pmlz0(:,:))*tzzz(:, :)+(1./h)*tmod%lbmu(:, :)*d1(:, :))/(1./dt+pmlz0(:, :)))
+       tzzz(:, :) = tzzz(:, :)+dth*tmod%lbmu(:, :)*d1(:, :)
        if(isurf == 1)then
           tzzx(nsp+1,:) = 0.
           tzzz(nsp+1,:) = 0.
@@ -245,11 +176,11 @@ contains
        call dxforward(uz, n1e, n2e, d2)
        call dzforward(ux, n1e, n2e, d1)
 
-       !call addpmlx(n1e, n2e, nsp, spg(1,:), spg(1,:), txzx)
-       !call addpmlz(n1e, n2e, nsp, spg(3,:), spg(3,:), txzz, isurf)
+       call addpmlx(n1e, n2e, nsp, spg(1,:), spg(1,:), txzx)
+       call addpmlz(n1e, n2e, nsp, spg(3,:), spg(3,:), txzz, isurf)
 
-       txzx(:, :) = (((1./dt-pmlx1(:,:))*txzx(:, :)+(1./h)*tmod%mue(:, :)*d2(:, :))/(1./dt+pmlx1(:, :)))
-       txzz(:, :) = (((1./dt-pmlz1(:,:))*txzz(:, :)+(1./h)*tmod%mue(:, :)*d1(:, :))/(1./dt+pmlz1(:, :)))
+       txzx(:, :) = txzx(:, :)+dth*tmod%mue(:, :)*d2(:, :)
+       txzz(:, :) = txzz(:, :)+dth*tmod%mue(:, :)*d1(:, :)
        if(isurf == 1)then
           txzx(nsp+1,:) = 0.
           txzz(nsp+1,:) = 0.
@@ -307,8 +238,6 @@ contains
     deallocate(txxx, txxz)
     deallocate(tzzx, tzzz)
     deallocate(txzx, txzz)
-
-    deallocate(pmlx0, pmlx1, pmlz0, pmlz1)
 
   end subroutine evolution
 
