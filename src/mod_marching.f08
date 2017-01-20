@@ -49,14 +49,15 @@ module marching
 
 contains
   
-  subroutine evolution(n1e, n2e, nsp, h,  dt, dts, nt, nts, nrec, srctype, &
+  subroutine evolution(n1e, n2e, nsp, h,  dt, dts, dtsnap, nt, nts, ntsnap, nrec, srctype, &
        tsrc, gsrc, spg, recx, recz, recp, tmod, isurf, &
-       pmlx0, pmlx1, pmlz0, pmlz1)
+       pmlx0, pmlx1, pmlz0, pmlz1, isnap)
 
     type(typemod) :: tmod
 
-    integer :: it, n1e, n2e, nsp, nt, i1, i2, nts, nrec, its, ets, ix, iz, irec, j, itt, srctype, isurf
-    real :: start, finish
+    integer :: it, n1e, n2e, nsp, nt, i1, i2, nts, nrec, its, ets, itsnap, ntsnap, isnap
+    integer :: etsnap, ix, iz, irec, j, itt, srctype, isurf
+    real :: start, finish, dtsnap
     real :: dt, dts, tsrc(nt), gsrc(n1e, n2e), spg(3, nsp+1), h, full
     real :: dth
     
@@ -113,6 +114,7 @@ contains
     its = 1
     itt = 1
     ets = (nt-1)/(nts-1)
+    etsnap = (nt-1)/(ntsnap-1)
 
     do it=1,nt
        call cpu_time(start)
@@ -236,28 +238,33 @@ contains
        full = full+(finish-start)
        write(*, * ) it, nt, finish-start, full, sqrt(maxval(ux)**2+maxval(uz)**2)
 
-       if(it < 10)then
-          write (snapfile, "(A8,I1)") "snap0000", it
-          open(31, file=snapfile, access='direct', recl=n1e*n2e*4)
-          write(31, rec=1) uz
-          close(31)
-       else if(it >= 10 .and. it < 100)then
-          write (snapfile, "(A7,I2)") "snap000", it
-          open(31, file=snapfile, access='direct', recl=n1e*n2e*4)
-          write(31, rec=1) uz
-          close(31)
-       else if(it >= 100 .and. it < 1000)then
-          write (snapfile, "(A6,I3)") "snap00", it
-          open(31, file=snapfile, access='direct', recl=n1e*n2e*4)
-          write(31, rec=1) uz
-          close(31)
-       else if(it >= 1000 .and. it < 10000)then
-          write (snapfile, "(A5,I4)") "snap0", it
-          open(31, file=snapfile, access='direct', recl=n1e*n2e*4)
-          write(31, rec=1) uz
-          close(31)
-       end if
-       
+       if((itsnap == etsnap .or. it == 1) .and. isnap == 1)then
+          itsnap = 1
+          if(it < 10)then
+             write (snapfile, "(A8,I1)") "snap0000", it
+             open(31, file=snapfile, access='direct', recl=n1e*n2e*4)
+             write(31, rec=1) uz
+             close(31)
+          else if(it >= 10 .and. it < 100)then
+             write (snapfile, "(A7,I2)") "snap000", it
+             open(31, file=snapfile, access='direct', recl=n1e*n2e*4)
+             write(31, rec=1) uz
+             close(31)
+          else if(it >= 100 .and. it < 1000)then
+             write (snapfile, "(A6,I3)") "snap00", it
+             open(31, file=snapfile, access='direct', recl=n1e*n2e*4)
+             write(31, rec=1) uz
+             close(31)
+          else if(it >= 1000 .and. it < 10000)then
+             write (snapfile, "(A5,I4)") "snap0", it
+             open(31, file=snapfile, access='direct', recl=n1e*n2e*4)
+             write(31, rec=1) uz
+             close(31)
+          end if
+       else
+          itsnap = itsnap+1
+       endif
+
        if(its == ets .or. it == 1)then
           its = 1
           do irec=1,nrec

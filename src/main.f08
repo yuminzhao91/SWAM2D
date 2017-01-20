@@ -12,7 +12,7 @@ program main
   implicit none
   
   integer :: i1, i2, n1e, n2e, is1, is2
-  integer :: nt, nts
+  integer :: nt, nts, ntsnap
   integer :: nrec
   real    :: tmax, t0, f0, sigma, xs, zs
   real, allocatable :: tsrc(:), gsrc(:, :)
@@ -22,8 +22,8 @@ program main
   real, allocatable :: recx(:, :), recz(:, :)
   integer, allocatable :: recp(:, :)
 
-  integer :: n1, n2, isurf, npml, srctype, srcfunc
-  real    :: dt, h, dts, apml
+  integer :: n1, n2, isurf, npml, srctype, srcfunc, isnap
+  real    :: dt, h, dts, apml, dtsnap
   integer :: ppml
   character(len=80) :: frun
   character(len=80) :: fvp, fvs, fro, facqui
@@ -33,15 +33,16 @@ program main
   !# >> Read input parameter file
   call parread(frun, tmax, dt, fvp, fvs, fro, n1, n2, &
        h, isurf, npml, apml, ppml, srctype, srcfunc, sigma, &
-       f0, t0, xs, zs, facqui, dts)
+       f0, t0, xs, zs, facqui, dts, isnap, dtsnap)
   
   !# >> Get source position index on extend grid
   call srcindex(xs, zs, npml, h, is1, is2)
 
   nt = nint(tmax/dt)+1
   nts = nint(tmax/dts)+1
+  ntsnap = nint(tmax/dtsnap)+1
 
-  write(*, *) nt, nts, nt/nts+1
+  write(*, *) nt, nts, nt/nts+1, ntsnap
 
   !# >> Acquisition
   call acqread(facqui, npml, h, nrec, recp)
@@ -99,9 +100,9 @@ program main
   call sponges(npml, apml, h, spg)
   
   write(*, * ) 'EVOLUTION'
-  call evolution(n1e, n2e, npml, h, dt, dts, nt, nts, nrec, srctype, tsrc, &
+  call evolution(n1e, n2e, npml, h, dt, dts, dtsnap, nt, nts, ntsnap, nrec, srctype, tsrc, &
        gsrc, spg, recx, recz, recp, tmod, isurf, &
-       pmlx0, pmlx1, pmlz0, pmlz1)
+       pmlx0, pmlx1, pmlz0, pmlz1, isnap)
 
   !# write seismos
   write(*, * ) nts, nrec
