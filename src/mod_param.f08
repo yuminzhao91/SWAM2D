@@ -18,10 +18,10 @@ contains
 
   subroutine parread(frun, tmax, dt, fvp, fvs, fro, n1, n2, h, &
        isurf, npml, apml, ppml, srctype, srcfunc, sigma, f0, t0, &
-       xs, zs, facqui, dts)
+       xs, zs, facqui, dts, isnap, dtsnap)
 
-    integer :: n1, n2, isurf, npml, srctype, srcfunc, ppml
-    real :: tmax, dt, h, apml, sigma, f0, t0, xs, zs, dts
+    integer :: n1, n2, isurf, npml, srctype, srcfunc, ppml, isnap
+    real :: tmax, dt, h, apml, sigma, f0, t0, xs, zs, dts, dtsnap
     character(len=*) :: frun, fvp, fvs, fro, facqui
 
     open(101, file='param.input', status='old')
@@ -40,6 +40,9 @@ contains
     read(101, *) !#[receiver]
     read(101, *) facqui
     read(101, *) dts
+    read(101, *) !#[snapshot]
+    read(101, *) isnap
+    read(101, *) dtsnap
     close(101)
 
   end subroutine parread

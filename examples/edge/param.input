@@ -13,3 +13,6 @@ fvp.bin fvs.bin fro.bin
 #[receiver]
 facqui.ascii
 0.00025
+#[snapshot]
+1
+0.1
