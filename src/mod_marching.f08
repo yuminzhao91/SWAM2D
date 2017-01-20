@@ -60,7 +60,8 @@ contains
     real :: start, finish, dtsnap
     real :: dt, dts, tsrc(nt), gsrc(n1e, n2e), spg(3, nsp+1), h, full
     real :: dth
-    
+   
+    real, allocatable :: tmpx(:, :), tmpz(:, :) 
     real :: recx(nts, nrec), recz(nts, nrec)
     integer :: recp(nrec,2)
 
@@ -75,6 +76,7 @@ contains
 
     character(len=80) :: snapfile
 
+
     ! >> ADDING PML TEMP. IN MARCHING MOD
     real, dimension(n1e, n2e) :: pmlx0, pmlx1, pmlz0, pmlz1
 
@@ -88,6 +90,10 @@ contains
     close(902)
 
     ! >> END PML
+   
+        ! >> DEBUG FIX
+    allocate(tmpx(n1e, n2e))
+    allocate(tmpz(n1e, n2e))
 
 
     dth = dt/h
@@ -120,7 +126,7 @@ contains
        call cpu_time(start)
 
        !# UX
-       
+       tmpx(:, :) = ux(:, :)       
        call dxforward(txx, n1e, n2e, d2)
        call dzbackward(txz, n1e, n2e, d1)
 
@@ -135,6 +141,7 @@ contains
        end if
        
        !# UZ
+       tmpz(:, :) = uz(:, :)
        call dxbackward(txz, n1e, n2e, d2)
        call dzforward(tzz, n1e, n2e, d1)
 
@@ -239,7 +246,7 @@ contains
        write(*, * ) it, nt, finish-start, full, sqrt(maxval(ux)**2+maxval(uz)**2)
 
        if((itsnap == etsnap .or. it == 1) .and. isnap == 1)then
-          itsnap = 1
+	  itsnap = 1
           if(it < 10)then
              write (snapfile, "(A8,I1)") "snap0000", it
              open(31, file=snapfile, access='direct', recl=n1e*n2e*4)
@@ -270,8 +277,8 @@ contains
           do irec=1,nrec
              ix = recp(irec, 1)
              iz = recp(irec, 2) 
-             recx(itt, irec) = ux(iz, ix)
-             recz(itt, irec) = uz(iz, ix)
+             recx(itt, irec) = (ux(iz, ix)+ux(iz,ix-1))/2.
+             recz(itt, irec) = (uz(iz, ix)+uz(iz-1,ix))/2.
           end do
           itt = itt + 1
        else
@@ -286,6 +293,9 @@ contains
     deallocate(txxx, txxz)
     deallocate(tzzx, tzzz)
     deallocate(txzx, txzz)
+
+    ! >> DEBUG FIX
+    deallocate(tmpx, tmpz)
 
   end subroutine evolution
 
