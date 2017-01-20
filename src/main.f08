@@ -106,10 +106,10 @@ program main
 
   !# write seismos
   write(*, * ) nts, nrec
-  open(41, file='recx.bin', access='direct', recl=nt*nrec*4)
+  open(41, file='recx.bin', access='direct', recl=nts*nrec*4)
   write(41, rec=1) recx
   close(41)
-  open(42, file='recz.bin', access='direct', recl=nt*nrec*4)
+  open(42, file='recz.bin', access='direct', recl=nts*nrec*4)
   write(42, rec=1) recz
   close(42)
 

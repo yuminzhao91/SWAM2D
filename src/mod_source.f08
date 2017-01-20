@@ -79,6 +79,9 @@ contains
 
     betasum = 0.
 
+    if( sigma .lt. 0.)then
+       gsrc(is1, is2) = 1.
+    else
     xs = float(is2-1)*h
     zs = float(is1-1)*h
     do i2=nsp+1,n2e-nsp
@@ -97,6 +100,7 @@ contains
           gsrc(i1, i2) = gsrc(i1, i2)/betasum
        end do
     end do
+    endif
 
   end subroutine srcspread
 
