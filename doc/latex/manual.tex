@@ -9,10 +9,6 @@
 
 \let\leqslant=\leq
 
-%\newcommand{\psm}{small-scale physical modeling method}
-%\newcommand{\bialt}{\textit{BiAlt} }
-%\newcommand{\cmnt}[1]{}
-
 \DeclareMathSizes{10}{10}{10}{10}
 
 \definecolor{light-gray}{gray}{0.95}
@@ -25,15 +21,14 @@
 	\end{center}
 }
 
+\renewcommand{\theequation}{\arabic{equation}}
+\renewcommand{\thefigure}{\arabic{figure}}
 
 \usepackage[dvipsnames]{xcolor}
 \usepackage{minibox}
 
 \usepackage{graphicx}
 \usepackage{color}
-
-\definecolor{vibrisblue1}{RGB}{90,151,190}
-\definecolor{vibrisblue2}{RGB}{25,96,177}
 
 \newcommand{\indice}[1]{\scriptsize{#1}}
 \newcommand{\subtitle}{FDPSV}
@@ -71,14 +66,9 @@
 \end{titlepage}
 
 % ----------------------------------------------------------------------
-% MANUAL LICENSE
+% COPYING (MANUAL)
 % ----------------------------------------------------------------------
-\null\vfill
-\pagenumbering{gobble}
-\noindent Copyright \copyright\ 2016-2017 Damien Pageot.\\
-
-\noindent Permission is granted to copy, distribute and/or modify this document under the terms of the GNU Free Documentation License, Version 1.3 or any later version published by the Free Software Foundation; with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts. A copy of the license is included in the section entitled "GNU Free Documentation License".
-\clearpage\newpage
+\input{copying}
 
 % ----------------------------------------------------------------------
 % TABLE OF CONTENTS
@@ -89,6 +79,7 @@
 \clearpage\newpage
 
 \pagenumbering{arabic}
+
 % ----------------------------------------------------------------------
 % INTRODUCTION
 % ----------------------------------------------------------------------
@@ -100,21 +91,44 @@
 % ----------------------------------------------------------------------
 \chapter{Theoretical background}
 
-\noindent test $\Sigma$, $\Xi$, $\mathsf{T}$
+\section{Governing equation}
+\index{governing equation}
 
+\noindent The equation of motion in an elastic medium can be written, in its compact formulation, as (\cite{aki2002quantitative}, \cite{virieux2016modelling}):
+
+\begin{equation}
+  \label{eq:motion}
+  \rho(x) \frac{\partial^{2}u_{i}}{\partial t^{2}} = \frac{\partial \tau_{ij}}{\partial x_{j}} + \rho(x)f_{i} ,
+\end{equation}
+
+\noindent where $x=(x,y,z)$ is the position vector, $u$ is the displacement, $\tau_{ij}$ is the stress tensor, $\rho(x)$ is the density and $f=(f_{x}, f_{y}, f_{z})$ is the a volumetric force.\\
+
+\noindent Second order hyperbolic system, called displacement-stress formulation:
+
+\index{displacement-stress formulation}
 \begin{eqnarray}
-  \frac{\partial v_{x}}{\partial t} = \rho^{{\scriptscriptstyle-1}} \left( \frac{\partial \tau_{xx}}{\partial x} + \frac{\partial \tau_{xz}}{\partial z} \right) \\
-  \frac{\partial v_{z}}{\partial t} = \rho^{{\scriptscriptstyle -1}} \left( \frac{\partial \tau_{xz}}{\partial x} + \frac{\partial \tau_{zz}}{\partial z} \right) \\
+  \label{eq:displacement-stress}
+  \frac{\partial ^{2} u_{x}}{\partial t^{2}} = \rho^{{\scriptscriptstyle-1}} \left( \frac{\partial \tau_{xx}}{\partial x} + \frac{\partial \tau_{xz}}{\partial z} \right) \nonumber \\
+  \frac{\partial ^{2} u_{z}}{\partial t^{2}} = \rho^{{\scriptscriptstyle -1}} \left( \frac{\partial \tau_{xz}}{\partial x} + \frac{\partial \tau_{zz}}{\partial z} \right) \nonumber \\
+  \tau_{xx} = (\lambda+2\mu)\frac{\partial u_{x}}{\partial x} + \lambda \frac{\partial u_{z}}{\partial z} \\
+  \tau_{zz}= (\lambda+2\mu)\frac{\partial u_{z}}{\partial z} + \lambda \frac{\partial u_{x}}{\partial x} \nonumber \\
+  \tau_{xz} = \mu \left( \frac{\partial u_{x}}{\partial z} + \frac{\partial u_{z}}{\partial x } \right) \nonumber
+\end{eqnarray}\\
+
+\noindent First-order hyperbolic system, called velocity-stress formulation:
+
+\index{velocity-stress formulation}
+\begin{eqnarray}
+  \label{eq:velocity-stress}
+  \frac{\partial v_{x}}{\partial t} = \rho^{{\scriptscriptstyle-1}} \left( \frac{\partial \tau_{xx}}{\partial x} + \frac{\partial \tau_{xz}}{\partial z} \right) \nonumber \\
+  \frac{\partial v_{z}}{\partial t} = \rho^{{\scriptscriptstyle -1}} \left( \frac{\partial \tau_{xz}}{\partial x} + \frac{\partial \tau_{zz}}{\partial z} \right) \nonumber \\
   \frac{\partial \tau_{xx}}{\partial t} = (\lambda+2\mu)\frac{\partial v_{x}}{\partial x} + \lambda \frac{\partial v_{z}}{\partial z} \\
-  \frac{\partial \tau_{zz}}{\partial t} = (\lambda+2\mu)\frac{\partial v_{z}}{\partial z} + \lambda \frac{\partial v_{x}}{\partial x} \\
-  \frac{\partial \tau_{xz}}{\partial t} = \mu \left( \frac{\partial v_{x}}{\partial z} + \frac{\partial v_{z}}{\partial x } \right)
+  \frac{\partial \tau_{zz}}{\partial t} = (\lambda+2\mu)\frac{\partial v_{z}}{\partial z} + \lambda \frac{\partial v_{x}}{\partial x} \nonumber \\
+  \frac{\partial \tau_{xz}}{\partial t} = \mu \left( \frac{\partial v_{x}}{\partial z} + \frac{\partial v_{z}}{\partial x } \right) \nonumber
 \end{eqnarray}
 
-\section{Equation of motion}
-\index{equation of motion}
-
-\section{Staggered grid}
-\index{staggered grid}
+\section{Staggered-grid scheme}
+\index{staggered-grid scheme}
 
 \cite{virieux1986psv,levander1988fourth}
 
@@ -124,6 +138,8 @@
   \caption{Staggered finite-difference grid and spatial stencils for (a) the velocity update and (b) the stress update. After \cite{levander1988fourth} with velocity-stress position switch proposed by \cite{bohlen2006accuracy}.}
   \label{fig:staggered-grid}
 \end{figure}
+
+\section{Discretization}
 
 \noindent Second order forward ($D^{+}$) and backward ($D^{-}$) operators:
 \index{forward operator}
@@ -160,7 +176,7 @@
 \begin{eqnarray}
 \label{pml-damp}
 d = d_{0} \left( \frac{q}{L_{PML}} \right) ^{n} \\
-d_{0} = 3c_{p} \frac{log(1/R)}{2L_{PML}}
+d_{0} = Ac_{p} \frac{log(1/R)}{2L_{PML}}
 \end{eqnarray}
 
 \subsection{Free surface}
@@ -205,10 +221,10 @@ d_{0} = 3c_{p} \frac{log(1/R)}{2L_{PML}}
 % ----------------------------------------------------------------------
 \chapter{Numerical examples}
 
-\begin{appendices}
 % ----------------------------------------------------------------------
 % APPENDICES
 % ----------------------------------------------------------------------
+\begin{appendices}
 %\chapter{Finite-difference equations}
 \index{finite-difference equations}
 \input{fdequation}
@@ -223,7 +239,7 @@ d_{0} = 3c_{p} \frac{log(1/R)}{2L_{PML}}
 % References
 % ----------------------------------------------------------------------
 
-\bibliography{references}
+\bibliography{references,bibmanual}
 
 \clearpage
 \newpage
