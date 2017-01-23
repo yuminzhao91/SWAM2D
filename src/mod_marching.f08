@@ -1,4 +1,22 @@
 !------------------------------------------------------------------------------
+! LICENSE
+!------------------------------------------------------------------------------
+! This file is part of SWAM2D.
+!
+! SWAM2D is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+!
+! SWAM2D is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+! GNU General Public License for more details.
+!
+! You should have received a copy of the GNU General Public License
+! along with SWAM2D. If not, see <http://www.gnu.org/licenses/>.
+!------------------------------------------------------------------------------
+!------------------------------------------------------------------------------
 ! MODULE: marching
 !------------------------------------------------------------------------------
 !> @brief
@@ -49,16 +67,16 @@ module marching
 
 contains
   
-  subroutine evolution(n1e, n2e, nsp, h,  dt, dts, dtsnap, nt, nts, ntsnap, nrec, srctype, &
-       tsrc, gsrc, spg, recx, recz, recp, tmod, isurf, &
+  subroutine evolution(n1e, n2e, nsp, h,  dt, nt, nts, ntsnap, nrec, srctype, &
+       tsrc, gsrc, recx, recz, recp, tmod, isurf, &
        pmlx0, pmlx1, pmlz0, pmlz1, isnap)
 
     type(typemod) :: tmod
 
-    integer :: it, n1e, n2e, nsp, nt, i1, i2, nts, nrec, its, ets, itsnap, ntsnap, isnap
-    integer :: etsnap, ix, iz, irec, j, itt, srctype, isurf
-    real :: start, finish, dtsnap
-    real :: dt, dts, tsrc(nt), gsrc(n1e, n2e), spg(3, nsp+1), h, full
+    integer :: it, n1e, n2e, nsp, nt, nts, nrec, its, ets, itsnap, ntsnap, isnap
+    integer :: etsnap, ix, iz, irec, itt, srctype, isurf
+    real :: start, finish
+    real :: dt, tsrc(nt), gsrc(n1e, n2e), h, full
     real :: dth
     
     real :: recx(nts, nrec), recz(nts, nrec)
@@ -112,6 +130,7 @@ contains
 
     full = 0.
     its = 1
+    itsnap = 1
     itt = 1
     ets = (nt-1)/(nts-1)
     etsnap = (nt-1)/(ntsnap-1)
@@ -223,7 +242,7 @@ contains
        write(*, * ) it, nt, finish-start, full, sqrt(maxval(ux)**2+maxval(uz)**2)
 
        if((itsnap == etsnap .or. it == 1) .and. isnap == 1)then
-	  itsnap = 1
+          itsnap = 1
           if(it < 10)then
              write (snapfile, "(A9,I1)") "snapz0000", it
              open(31, file=snapfile, access='direct', recl=n1e*n2e*4)

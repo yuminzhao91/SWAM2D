@@ -1,3 +1,21 @@
+!------------------------------------------------------------------------------
+! LICENSE
+!------------------------------------------------------------------------------
+! This file is part of SWAM2D.
+!
+! SWAM2D is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+!
+! SWAM2D is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+! GNU General Public License for more details.
+!
+! You should have received a copy of the GNU General Public License
+! along with SWAM2D. If not, see <http://www.gnu.org/licenses/>.
+!------------------------------------------------------------------------------
 program main
 
   use types
@@ -11,14 +29,13 @@ program main
 
   implicit none
   
-  integer :: i1, i2, n1e, n2e, is1, is2
+  integer :: n1e, n2e, is1, is2
   integer :: nt, nts, ntsnap
   integer :: nrec
   real    :: tmax, t0, f0, sigma, xs, zs
   real, allocatable :: tsrc(:), gsrc(:, :)
   real, allocatable :: pmlx0(:, :), pmlx1(:, :)
   real, allocatable :: pmlz0(:, :), pmlz1(:, :)
-  real, allocatable :: spg(:,:)
   real, allocatable :: recx(:, :), recz(:, :)
   integer, allocatable :: recp(:, :)
 
@@ -46,9 +63,11 @@ program main
 
   !# >> Acquisition
   call acqread(facqui, npml, h, nrec, recp)
+
+  !# >> Allocate recorded seismogram arrays
   allocate(recx(nts, nrec), recz(nts, nrec))
 
-  !# >> Extend dimensions
+  !# >> Extend model dimensions with PML
   n1e = n1+2*npml
   n2e = n2+2*npml
   
@@ -80,6 +99,8 @@ program main
 
   allocate(pmlx0(n1e, n2e), pmlx1(n1e, n2e))
   allocate(pmlz0(n1e, n2e), pmlz1(n1e, n2e))
+
+  !# >> Calculate PMLs
   call pmlmod(tmod%vpe, n1e, n2e, h, npml, apml, ppml, &
        pmlx0, pmlx1, pmlz0, pmlz1)
   
@@ -90,18 +111,15 @@ program main
   !# >> Source
   allocate(tsrc(nt), gsrc(n1e, n2e)) 
   call ricker(nt, dt, f0, t0, tsrc)
-  call srcspread(n1e, n2e, npml, is1, is2, h, gsrc, sigma)
 
-  allocate(spg(3, npml+1))
+  !# srcspread strongly affect results remove and replace with single point gsrc
+  !call srcspread(n1e, n2e, npml, is1, is2, h, gsrc, sigma)
+  gsrc(:, :) = 0.
+  gsrc(is1, is2) = 1.
 
-  spg(:, : ) = 1.
-
-  write(*, * ) 'SPONGES'
-  call sponges(npml, apml, h, spg)
-  
   write(*, * ) 'EVOLUTION'
-  call evolution(n1e, n2e, npml, h, dt, dts, dtsnap, nt, nts, ntsnap, nrec, srctype, tsrc, &
-       gsrc, spg, recx, recz, recp, tmod, isurf, &
+  call evolution(n1e, n2e, npml, h, dt, nt, nts, ntsnap, nrec, srctype, tsrc, &
+       gsrc, recx, recz, recp, tmod, isurf, &
        pmlx0, pmlx1, pmlz0, pmlz1, isnap)
 
   !# write seismos

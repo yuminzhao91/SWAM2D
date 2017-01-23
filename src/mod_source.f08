@@ -1,4 +1,22 @@
 !------------------------------------------------------------------------------
+! LICENSE
+!------------------------------------------------------------------------------
+! This file is part of SWAM2D.
+!
+! SWAM2D is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+!
+! SWAM2D is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+! GNU General Public License for more details.
+!
+! You should have received a copy of the GNU General Public License
+! along with SWAM2D. If not, see <http://www.gnu.org/licenses/>.
+!------------------------------------------------------------------------------
+!------------------------------------------------------------------------------
 ! MODULE: source
 !------------------------------------------------------------------------------
 !> \brief subroutines related to source time function generation, source
@@ -31,7 +49,7 @@ contains
 
   subroutine srcaddforce(ve, n1e, n2e, dt, dx, src, g)
     !> \brief Add vertical or horizontal force source.
-    integer:: i1, i2, n1e, n2e
+    integer:: n1e, n2e
     real :: dt, dx, src
     real :: ve(n1e, n2e), g(n1e, n2e)
 

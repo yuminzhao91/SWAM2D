@@ -1,4 +1,22 @@
 !------------------------------------------------------------------------------
+! LICENSE
+!------------------------------------------------------------------------------
+! This file is part of SWAM2D.
+!
+! SWAM2D is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+!
+! SWAM2D is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+! GNU General Public License for more details.
+!
+! You should have received a copy of the GNU General Public License
+! along with SWAM2D. If not, see <http://www.gnu.org/licenses/>.
+!------------------------------------------------------------------------------
+!------------------------------------------------------------------------------
 ! MODULE: model
 !------------------------------------------------------------------------------
 !> \brief subroutines to read, to extend and calculate physical parameter
@@ -44,7 +62,7 @@ contains
     !> \param[in] n2 The number of grid points in the second direction (x)
     !> \param[in] nsp The number of grid points added for ABC layers 
     !> \param[out] ve physical parameter array of size (n1+2*nsp, n2+2*nsp)
-    integer :: i, n1, n2, n1e, n2e, nsp
+    integer :: i, n1, n2, nsp
     real :: v(n1, n2), ve(n1+2*nsp, n2+2*nsp)
 
     ve(nsp+1:n1+nsp,nsp+1:n2+nsp) = v(1:n1,1:n2)
