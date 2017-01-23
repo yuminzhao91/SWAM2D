@@ -60,8 +60,7 @@ contains
     real :: start, finish, dtsnap
     real :: dt, dts, tsrc(nt), gsrc(n1e, n2e), spg(3, nsp+1), h, full
     real :: dth
-   
-    real, allocatable :: tmpx(:, :), tmpz(:, :) 
+    
     real :: recx(nts, nrec), recz(nts, nrec)
     integer :: recp(nrec,2)
 
@@ -91,11 +90,6 @@ contains
 
     ! >> END PML
    
-        ! >> DEBUG FIX
-    allocate(tmpx(n1e, n2e))
-    allocate(tmpz(n1e, n2e))
-
-
     dth = dt/h
     
     write(*, *) 'EVOLUTION ALLOCATION'
@@ -125,14 +119,10 @@ contains
     do it=1,nt
        call cpu_time(start)
 
-       !# UX
-       tmpx(:, :) = ux(:, :)       
+       !# UX       
        call dxforward(txx, n1e, n2e, d2)
        call dzbackward(txz, n1e, n2e, d1)
-
-       !call addpmlx(n1e, n2e, nsp, spg(3,:), spg(3,:), uxx)
-       !call addpmlz(n1e, n2e, nsp, spg(1,:), spg(1,:), uxz, isurf)
-
+       
        uxx(:, :) = (((1./dt-pmlx1(:,:))*uxx(:, :)+(1./h)*tmod%bux(:, :)*d2(:, :))/(1./dt+pmlx1(:, :)))
        uxz(:, :) = (((1./dt-pmlz0(:,:))*uxz(:, :)+(1./h)*tmod%bux(:, :)*d1(:, :))/(1./dt+pmlz0(:, :))) !uxz(:, :)+dth*tmod%bux(:, :)*d1(:, :)
        ux(:, :) = uxx(:, :)+uxz(:, :)
@@ -141,12 +131,8 @@ contains
        end if
        
        !# UZ
-       tmpz(:, :) = uz(:, :)
        call dxbackward(txz, n1e, n2e, d2)
        call dzforward(tzz, n1e, n2e, d1)
-
-       !call addpmlx(n1e, n2e, nsp, spg(1,:), spg(1,:), uzx)
-       !call addpmlz(n1e, n2e, nsp, spg(3,:), spg(3,:), uzz, isurf)
 
        if(srctype== 2)then
           uzx(:, :) = (((1./dt-pmlx0(:,:))*uzx(:, :)+(1./h)*tmod%buz(:, :)*d2(:, :) &
@@ -186,9 +172,6 @@ contains
        call dxbackward(ux, n1e, n2e, d2)
        call dzbackward(uz, n1e, n2e, d1)
 
-       !call addpmlx(n1e, n2e, nsp, spg(1,:), spg(1,:), txxx)
-       !call addpmlz(n1e, n2e, nsp, spg(1,:), spg(1,:), txxz, isurf)
-
        if(srctype == 1)then
           txxx(:, :) = (((1./dt-pmlx0(:,:))*txxx(:, :)+(1./h)*tmod%lbmu(:, :)*d2(:, :)&
                +(tsrc(it)*gsrc(:,:))/(h*h))/(1./dt+pmlx0(:, :)))
@@ -202,9 +185,6 @@ contains
           txx(nsp+1, :) = txxx(nsp+1, :)
        end if
        
-       !call addpmlx(n1e, n2e, nsp, spg(1,:), spg(1,:), tzzx)
-       !call addpmlz(n1e, n2e, nsp, spg(1,:), spg(1,:), tzzz, isurf)
-
        if(srctype == 0 .or. srctype == 1)then
           tzzx(:, :) = (((1./dt-pmlx0(:,:))*tzzx(:, :)+(1./h)*tmod%lb0(:, :)*d2(:, :)&
                +(tsrc(it)*gsrc(:,:))/(h*h))/(1./dt+pmlx0(:, :)))
@@ -226,9 +206,6 @@ contains
        call dxforward(uz, n1e, n2e, d2)
        call dzforward(ux, n1e, n2e, d1)
 
-       !call addpmlx(n1e, n2e, nsp, spg(1,:), spg(1,:), txzx)
-       !call addpmlz(n1e, n2e, nsp, spg(3,:), spg(3,:), txzz, isurf)
-
        txzx(:, :) = (((1./dt-pmlx1(:,:))*txzx(:, :)+(1./h)*tmod%mue(:, :)*d2(:, :))/(1./dt+pmlx1(:, :)))
        txzz(:, :) = (((1./dt-pmlz1(:,:))*txzz(:, :)+(1./h)*tmod%mue(:, :)*d1(:, :))/(1./dt+pmlz1(:, :)))
        if(isurf == 1)then
@@ -248,25 +225,41 @@ contains
        if((itsnap == etsnap .or. it == 1) .and. isnap == 1)then
 	  itsnap = 1
           if(it < 10)then
-             write (snapfile, "(A8,I1)") "snap0000", it
+             write (snapfile, "(A9,I1)") "snapz0000", it
              open(31, file=snapfile, access='direct', recl=n1e*n2e*4)
              write(31, rec=1) uz
              close(31)
+             write (snapfile, "(A9,I1)") "snapx0000", it
+             open(32, file=snapfile, access='direct', recl=n1e*n2e*4)
+             write(32, rec=1) ux
+             close(32)
           else if(it >= 10 .and. it < 100)then
-             write (snapfile, "(A7,I2)") "snap000", it
+             write (snapfile, "(A8,I2)") "snapz000", it
              open(31, file=snapfile, access='direct', recl=n1e*n2e*4)
              write(31, rec=1) uz
              close(31)
+             write (snapfile, "(A8,I2)") "snapx000", it
+             open(32, file=snapfile, access='direct', recl=n1e*n2e*4)
+             write(32, rec=1) ux
+             close(32)
           else if(it >= 100 .and. it < 1000)then
-             write (snapfile, "(A6,I3)") "snap00", it
+             write (snapfile, "(A7,I3)") "snapz00", it
              open(31, file=snapfile, access='direct', recl=n1e*n2e*4)
              write(31, rec=1) uz
              close(31)
+             write (snapfile, "(A7,I3)") "snapx00", it
+             open(32, file=snapfile, access='direct', recl=n1e*n2e*4)
+             write(32, rec=1) ux
+             close(32)
           else if(it >= 1000 .and. it < 10000)then
-             write (snapfile, "(A5,I4)") "snap0", it
+             write (snapfile, "(A6,I4)") "snapz0", it
              open(31, file=snapfile, access='direct', recl=n1e*n2e*4)
              write(31, rec=1) uz
              close(31)
+             write (snapfile, "(A6,I4)") "snapx0", it
+             open(32, file=snapfile, access='direct', recl=n1e*n2e*4)
+             write(32, rec=1) ux
+             close(32)
           end if
        else
           itsnap = itsnap+1
@@ -293,9 +286,6 @@ contains
     deallocate(txxx, txxz)
     deallocate(tzzx, tzzz)
     deallocate(txzx, txzz)
-
-    ! >> DEBUG FIX
-    deallocate(tmpx, tmpz)
 
   end subroutine evolution
 

@@ -1,5 +1,6 @@
 FC=gfortran
 FFLAGS=-W -Wall -O3 -ffast-math -fno-protect-parens -fstack-arrays -march=native
+FFLAGS_DEBUG=-W -Wall -C -g
 LDFLAGS=
 BIN=../bin/
 LIB=../lib/
@@ -9,6 +10,9 @@ SRC=mod_param.f08 mod_acquisition.f08 mod_types.f08 mod_boundaries.f08 mod_deriv
 OBJ=$(SRC:.f08=.o)
 
 all: $(BIN)/$(EXEC)
+
+debug: FFLAGS=$(FFLAGS_DEBUG)
+debug: $(BIN)/$(EXEC)
 
 $(BIN)/$(EXEC): $(OBJ)
 	$(FC) -o $@ $^ $(LDFLAGS)
