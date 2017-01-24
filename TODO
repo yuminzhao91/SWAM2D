@@ -2,6 +2,7 @@ FDPSV -- TODO
 
 Todo:
 
+    * check signal and snapshot recording
     * fdpsv-1D
     * body force implementation
     * wavefield interpolation procedure

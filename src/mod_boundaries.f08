@@ -76,4 +76,31 @@ contains
     
   end subroutine pmlmod
 
+  subroutine dirichlet(n1e, n2e, uxx, uxz, uzx, uzz)
+    ! implement Dirichlet boundary conditions on the four edges of the grid
+    integer :: n1e, n2e
+    real, dimension(n1e,n2e) :: uxx, uxz, uzx, uzz
+
+    uxx(1, :) = 0.
+    uxx(n1e, :)= 0.
+    uxx(:, 1) = 0.
+    uxx(:, n2e)= 0.
+
+    uxz(1, :) = 0.
+    uxz(n1e, :)= 0.
+    uxz(:, 1) = 0.
+    uxz(:, n2e)= 0.
+    
+    uzx(1, :) = 0.
+    uzx(n1e, :)= 0.
+    uzx(:, 1) = 0.
+    uzx(:, n2e)= 0.
+    
+    uzz(1, :) = 0.
+    uzz(n1e, :)= 0.
+    uzz(:, 1) = 0.
+    uzz(:, n2e)= 0.
+    
+  end subroutine dirichlet
+  
 end module boundaries

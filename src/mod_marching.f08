@@ -98,13 +98,13 @@ contains
     real, dimension(n1e, n2e) :: pmlx0, pmlx1, pmlz0, pmlz1
 
 
-    open(901, file='test_pmlz0.bin', access='direct', recl=n1e*n2e*4)
-    write(901, rec=1) pmlz0
-    close(901)
+    !open(901, file='test_pmlz0.bin', access='direct', recl=n1e*n2e*4)
+    !write(901, rec=1) pmlz0
+    !close(901)
 
-    open(902, file='test_pmlz1.bin', access='direct', recl=n1e*n2e*4)
-    write(902, rec=1) pmlz1
-    close(902)
+    !open(902, file='test_pmlz1.bin', access='direct', recl=n1e*n2e*4)
+    !write(902, rec=1) pmlz1
+    !close(902)
 
     ! >> END PML
    
@@ -112,15 +112,34 @@ contains
     
     write(*, *) 'EVOLUTION ALLOCATION'
     allocate(d1(n1e, n2e), d2(n1e, n2e))
-    allocate(ux(n1e, n2e), uz(n1e, n2e), txx(n1e, n2e), tzz(n1e, n2e), txz(n1e, n2e))
+
+    ! >> Allocate velocity fields
+    allocate(ux(n1e, n2e), uz(n1e, n2e))
+
+    ! >> Allocate stress fields
+    allocate(txx(n1e, n2e), tzz(n1e, n2e), txz(n1e, n2e))
+
+    ! >> Allocate splited velocity fields
     allocate(uxx(n1e, n2e), uxz(n1e, n2e))
     allocate(uzx(n1e, n2e), uzz(n1e, n2e))
+
+    ! >> Allocate splited stress fields 
     allocate(txxx(n1e, n2e), txxz(n1e, n2e))
     allocate(tzzx(n1e, n2e), tzzz(n1e, n2e))
     allocate(txzx(n1e, n2e), txzz(n1e, n2e))
 
+    ! >> Initialize velocity fields (including splitted)
+    ux(:, :) = 0.
+    uz(:, :) = 0.
     uxx(:, :) = 0.
     uxz(:, :) = 0.
+    uzx(:, :) = 0.
+    uzz(:, : ) = 0.
+
+    ! >> Initialize stress fields (including splitted)
+    txx(:, :) = 0.
+    tzz(:, :) = 0.
+    txz(:, :) = 0.
     txxx(:, :) = 0.
     txxz(:, :) = 0.
     tzzx(:, :) = 0.
@@ -128,6 +147,7 @@ contains
     txzx(:, :) = 0.
     txzz(:, :) = 0.
 
+    ! >> Initialize marching and sampling parameters
     full = 0.
     its = 1
     itsnap = 1
@@ -135,15 +155,18 @@ contains
     ets = (nt-1)/(nts-1)
     etsnap = (nt-1)/(ntsnap-1)
 
+    ! >> Start marching
     do it=1,nt
        call cpu_time(start)
 
-       !# UX       
+       !# UX
+       !# dux/dut = (1/rho)[dtxx/dx+dtxz/dz]
+       
        call dxforward(txx, n1e, n2e, d2)
        call dzbackward(txz, n1e, n2e, d1)
        
        uxx(:, :) = (((1./dt-pmlx1(:,:))*uxx(:, :)+(1./h)*tmod%bux(:, :)*d2(:, :))/(1./dt+pmlx1(:, :)))
-       uxz(:, :) = (((1./dt-pmlz0(:,:))*uxz(:, :)+(1./h)*tmod%bux(:, :)*d1(:, :))/(1./dt+pmlz0(:, :))) !uxz(:, :)+dth*tmod%bux(:, :)*d1(:, :)
+       uxz(:, :) = (((1./dt-pmlz0(:,:))*uxz(:, :)+(1./h)*tmod%bux(:, :)*d1(:, :))/(1./dt+pmlz0(:, :)))
        ux(:, :) = uxx(:, :)+uxz(:, :)
        if(isurf == 1)then
           ux(1:nsp,:) = 0.
@@ -166,26 +189,9 @@ contains
           uz(1:nsp,:) = 0.
        end if
        
+       call dirichlet( n1e, n2e, uxx, uxz, uzx, uzz)
        ! implement Dirichlet boundary conditions on the four edges of the grid
-       uxx(1, :) = 0.
-       uxx(n1e, :)= 0.
-       uxx(:, 1) = 0.
-       uxx(:, n2e)= 0.
-
-       uxz(1, :) = 0.
-       uxz(n1e, :)= 0.
-       uxz(:, 1) = 0.
-       uxz(:, n2e)= 0.
-
-       uzx(1, :) = 0.
-       uzx(n1e, :)= 0.
-       uzx(:, 1) = 0.
-       uzx(:, n2e)= 0.
-
-       uzz(1, :) = 0.
-       uzz(n1e, :)= 0.
-       uzz(:, 1) = 0.
-       uzz(:, n2e)= 0.
+       
 
        !# TXX -- TZZ
        call dxbackward(ux, n1e, n2e, d2)
@@ -300,11 +306,18 @@ contains
     end do
 
     deallocate(d1, d2)
-    deallocate(ux, uz, txx, tzz, txz)
-    deallocate(uxx, uzz)
-    deallocate(txxx, txxz)
-    deallocate(tzzx, tzzz)
-    deallocate(txzx, txzz)
+
+    ! >> Free velocity fields 
+    deallocate(ux, uz)
+
+    ! >> Free splitted velocity fields
+    deallocate(uxx, uxz, uzx, uzz)
+
+    ! >> Free stress fields
+    deallocate(txx, tzz, txz)
+
+    !>> Free splitted stress fields
+    deallocate(txxx, txxz, tzzx, tzzz, txzx, txzz)
 
   end subroutine evolution
 

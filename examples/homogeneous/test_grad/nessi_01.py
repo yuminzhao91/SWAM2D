@@ -20,7 +20,7 @@ for i1 in range(0, n1):
     elif(z <=4. and z > 2.):
         vs[n1-1-i1,:] = 240.
         vp[n1-1-i1,:] = 240.*np.sqrt(3.)
-    else:
+    elif(z <= 2.):
         vs[n1-1-i1,:] = 200.
         vp[n1-1-i1,:] = 200.*np.sqrt(3.)
 
