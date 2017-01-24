@@ -9,7 +9,7 @@ fvp.bin fvs.bin fro.bin
 #[source]
 1 2 -1
 30. 0.05
-25. 100. 
+5.0 50. 
 #[receiver]
 acquisition.dat
 0.00025
