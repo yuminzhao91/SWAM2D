@@ -140,41 +140,49 @@
 
 \RequirePackage{color}
 
-\definecolor{bashbkgd}{RGB}{209,214,217}
+% >> Tango color palette
+% <http://tango.freedesktop.org/static/cvs/tango-art-tools/palettes/Tango-Palette.png>
+
+% yellow
 \definecolor{butter1}{RGB}{252,233,79}
 \definecolor{butter2}{RGB}{237,212,0}
 \definecolor{butter3}{RGB}{196,160,0}
 
+% orange
 \definecolor{orange1}{RGB}{252,175,62}
 \definecolor{orange2}{RGB}{245,121,0}
 \definecolor{orange3}{RGB}{206,92,0}
+\definecolor{orange1t}{RGB}{252,200,87}
 
+% brown
 \definecolor{chocolate1}{RGB}{233,185,110}
 \definecolor{chocolate2}{RGB}{193,125,17}
 \definecolor{chocolate3}{RGB}{143,89,2}
 
+% green
 \definecolor{chameleon1}{RGB}{138,226,52}
 \definecolor{chameleon2}{RGB}{115,210,22}
 \definecolor{chameleon3}{RGB}{78,154,6}
 
+% blue
 \definecolor{skyblue1}{RGB}{114,159,207}
 \definecolor{skyblue2}{RGB}{52,101,164}
 \definecolor{skyblue3}{RGB}{32,74,135}
 
+% purple
 \definecolor{plum1}{RGB}{173,127,168}
 \definecolor{plum2}{RGB}{117,80,123}
 \definecolor{plum3}{RGB}{92,53,102}
 
+% red
 \definecolor{scarlet1}{RGB}{239,41,41}
 \definecolor{scarlet2}{RGB}{204,0,0}
 \definecolor{scarlet3}{RGB}{164,0,0}
 
+% gray
 \definecolor{aluminium1}{RGB}{238,238,236}
 \definecolor{aluminium2}{RGB}{211,215,207}
 \definecolor{aluminium3}{RGB}{186,189,182}
 \definecolor{aluminium4}{RGB}{136,138,133}
 \definecolor{aluminium5}{RGB}{85,87,83}
 \definecolor{aluminium6}{RGB}{46,52,54}
-
-\definecolor{vibrisblue1}{RGB}{90,151,190}
-\definecolor{vibrisblue2}{RGB}{25,96,177}
