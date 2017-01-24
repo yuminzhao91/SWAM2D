@@ -199,7 +199,7 @@ contains
 
        if(srctype == 1)then
           txxx(:, :) = (((1./dt-pmlx0(:,:))*txxx(:, :)+(1./h)*tmod%lbmu(:, :)*d2(:, :)&
-               +(tsrc(it)*gsrc(:,:))/(h*h))/(1./dt+pmlx0(:, :)))
+               )/(1./dt+pmlx0(:, :)))+(tsrc(it)*gsrc(:,:))/(h*h)*dt
        else
           txxx(:, :) = (((1./dt-pmlx0(:,:))*txxx(:, :)+(1./h)*tmod%lbmu(:, :)*d2(:, :))/(1./dt+pmlx0(:, :)))
        end if
@@ -212,7 +212,7 @@ contains
        
        if(srctype == 0 .or. srctype == 1)then
           tzzx(:, :) = (((1./dt-pmlx0(:,:))*tzzx(:, :)+(1./h)*tmod%lb0(:, :)*d2(:, :)&
-               +(tsrc(it)*gsrc(:,:))/(h*h))/(1./dt+pmlx0(:, :)))
+               )/(1./dt+pmlx0(:, :)))+(tsrc(it)*gsrc(:,:))/(h*h)*dt
        else
           tzzx(:, :) = (((1./dt-pmlx0(:,:))*tzzx(:, :)+(1./h)*tmod%lb0(:, :)*d2(:, :))/(1./dt+pmlx0(:, :)))
        end if
