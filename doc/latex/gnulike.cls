@@ -36,7 +36,9 @@
 %%
 \RequirePackage[T1]{fontenc}
 \RequirePackage{times}
+%\RequirePackage{lmodern}
 \RequirePackage{mathptmx}
+%\RequirePackage{lmmath}
 \RequirePackage{titlesec}
 %\RequirePackage[hidelinks,colorlinks=true,citecolor=vibrisblue2,linkcolor=vibrisblue2,urlcolor=blue]{hyperref}
 \RequirePackage[hidelinks]{hyperref}
