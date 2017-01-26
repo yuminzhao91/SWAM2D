@@ -1,25 +1,3 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% This is file 'stp2012.cls' %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%
-%% Made by: Bobby Hak
-%%
-%% This class has been tested with:
-%%     MikTeX version 2.9
-%%
-%% It is based on the standard LaTeX2e "article" class and some
-%% standard packages:
-%%    times    - for the font Times New Roman, 11pt
-%%    mathptmx - for the font Times New Romen with math support
-%%    fancyhdr - for defining headnote and footnote
-%%    graphicx - for including logo
-%%    geometry - for putting page dimensions correct
-%%    natbib   - for referencing
-%%
-%% All packages should be availble in any normal distribution of LaTeX,
-%% or can be downloaded from the CTAN homepage:
-%%    www.ctan.org
-%%
 \NeedsTeXFormat{LaTeX2e}[1996/12/01]
 \ProvidesClass{gnulike}[2017/01/10 v1.0]
 %%
@@ -36,9 +14,7 @@
 %%
 \RequirePackage[T1]{fontenc}
 \RequirePackage{times}
-%\RequirePackage{lmodern}
 \RequirePackage{mathptmx}
-%\RequirePackage{lmmath}
 \RequirePackage{titlesec}
 %\RequirePackage[hidelinks,colorlinks=true,citecolor=vibrisblue2,linkcolor=vibrisblue2,urlcolor=blue]{hyperref}
 \RequirePackage[hidelinks]{hyperref}
@@ -46,99 +22,7 @@
 %% Page size formats
 %%
 \RequirePackage[a4paper]{geometry}
-%\geometry{
-% a4paper,
-% left=20mm,
-% right=20mm,
-% }
 \geometry{left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm}
-%\geometry{head=0.68in,headsep=0.09in,foot=0.5in}
-%\addtolength{\footskip}{-1.0\baselineskip}
-%%
-%% some others
-%%
-%\setcounter{secnumdepth}{0} % no numbering of sections
-%\setlength{\parindent}{0pt} % no indent for new paragraphs
-%\setlength{\parskip}{11pt} % skip one line between paragraphs
-%\setlength{\partopsep}{0pt} % skip between environments and paragraphs
-%\setlength{\topsep}{0pt} % skip between environments and paragraphs
-%%
-%% bibliography
-%%
-\RequirePackage{natbib} % special citing commands
-\gdef\bibfont{\fontsize{10}{10}\selectfont}
-%\newcommand{\bibfont}{\fontsize{10}{10}\selectfont} % bibliography fontsize
-%\setlength{\bibsep}{1pt} % no lines between bibitems
-\setlength{\bibhang}{0em} % indentation of second line in bibitem
-\bibliographystyle{apalike}  %{firstbreak} % stylefile
-%%
-%% set header and footer
-%%
-\RequirePackage{fancyhdr}
-\RequirePackage{graphicx}
-\pagestyle{fancy}
-\fancyhf{}
-\rhead{\thepage}
-\lhead{\leftmark}
-%\rfoot{Page \thepage}
-%\pagestyle{fancy} % load package
-%\fancyhf{} % clear styles
-%\fancyhead{test} % input logo top right, even and odd side
-%\fancyfoot[C]{\vspace{-1pt}\fontsize{10}{10}\selectfont{%
-%\color{vibrisblue2}VIBRIS Project -- Intermediate Report\\
-%Physical and Numerical Experiments -- Damien Pageot
-%}} % footnote
-\renewcommand{\headrulewidth}{0pt} % no line in header
-
-\fancypagestyle{plain}{%
-  \fancyhf{}%
-  \rhead{\thepage}
-  \lhead{\nouppercase{\leftmark}}
-  %\fancyfoot[C]{\thepage\ of \pageref{LastPage}}%
-  %\renewcommand{\headrulewidth}{0pt}% Line at the header invisible
-  %\renewcommand{\footrulewidth}{0.4pt}% Line at the footer visible
-}
-
-\fancypagestyle{contents}{%
-  \fancyhf{}%
-  \rhead{}
-  \lhead{}
-  %\fancyfoot[C]{\thepage\ of \pageref{LastPage}}%
-  %\renewcommand{\headrulewidth}{0pt}% Line at the header invisible
-  %\renewcommand{\footrulewidth}{0.4pt}% Line at the footer visible
-}
-
-%\renewcommand{\footrulewidth}{0.4pt} % add line in footnote
-%\pagenumbering{gobble} % define page numbering
-%%
-%% section headers and paragraphs
-%%
-%\renewcommand{\section}{\@startsection{section}%
-%{1}% level
-%{0pt}% indent
-%{.1ex plus -.1ex}% beforeskip
-%{.1ex plus -.1ex}% afterskip
-%{\fontsize{11}{11}\selectfont\bf}} % font
-%
-%\renewcommand{\subsection}{\@startsection{subsection}%
-%{2}% level
-%{0pt}% indent
-%{.1ex plus -.1ex}% beforeskip
-%{.1ex plus -.1ex}% afterskip
-%{\fontsize{11}{11}\selectfont\emph\bf}} % font
-%%
-%% caption font
-%%
-%\long\def\@makecaption#1#2{%
-%  \vskip\abovecaptionskip
-%  \sbox\@tempboxa{{\bf\itshape #1} \itshape #2}%
-%  \ifdim \wd\@tempboxa >\hsize
-%    {{\bf\itshape #1} \itshape #2\par}
-%  \else
-%    \hbox to\hsize{\hfil\box\@tempboxa\hfil}%
-%  \fi
-%  \vskip\belowcaptionskip}
-% EOF
 
 \RequirePackage{color}
 
@@ -188,3 +72,36 @@
 \definecolor{aluminium4}{RGB}{136,138,133}
 \definecolor{aluminium5}{RGB}{85,87,83}
 \definecolor{aluminium6}{RGB}{46,52,54}
+
+%%
+%% bibliography
+%%
+\RequirePackage{natbib}
+\gdef\bibfont{\fontsize{10}{10}\selectfont}
+\setlength{\bibhang}{0em}
+\bibliographystyle{apalike}
+
+%%
+%% set header and footer
+%%
+\RequirePackage{fancyhdr}
+\RequirePackage{graphicx}
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\textcolor{aluminium4}{\thepage}}
+\lhead{\textcolor{aluminium4}{\leftmark}}
+\renewcommand{\headrulewidth}{1pt}% 2pt header rule
+\renewcommand{\headrule}{\hbox to\headwidth{%
+  \color{aluminium4}\leaders\hrule height \headrulewidth\hfill}}
+
+\fancypagestyle{plain}{%
+  \fancyhf{}%
+  \rhead{\textcolor{aluminium4}{\thepage}}
+  \lhead{\textcolor{aluminium4}{\leftmark}}
+}
+
+\fancypagestyle{contents}{%
+  \fancyhf{}%
+  \rhead{}
+  \lhead{}
+}
