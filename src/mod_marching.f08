@@ -182,8 +182,8 @@ contains
        call dzforward(tzz, n1e, n2e, d1)
 
        if(srctype== 2)then
-          uzx(:, :) = (((1./dt-pmlx0(:,:))*uzx(:, :)+(1./h)*tmod%buz(:, :)*d2(:, :) &
-               +(tsrc(it)*gsrc(:,:))*dt/(h*h))/(1./dt+pmlx0(:, :)))
+          uzx(:, :) = (((1./dt-pmlx0(:,:))*uzx(:, :)+(1./h)*tmod%buz(:, :)*d2(:, :))/(1./dt+pmlx0(:, :))) &
+               +tmod%buz*(tsrc(it)*gsrc(:, :)*dt/(h*h))
        else
           uzx(:, :) = (((1./dt-pmlx0(:,:))*uzx(:, :)+(1./h)*tmod%buz(:, :)*d2(:, :))/(1./dt+pmlx0(:, :)))
        end if
