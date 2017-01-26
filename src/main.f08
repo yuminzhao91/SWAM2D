@@ -36,8 +36,8 @@ program main
   real, allocatable :: tsrc(:), gsrc(:, :)
   real, allocatable :: pmlx0(:, :), pmlx1(:, :)
   real, allocatable :: pmlz0(:, :), pmlz1(:, :)
-  real, allocatable :: recx(:, :), recz(:, :)
-  integer, allocatable :: recp(:, :)
+  real, allocatable :: recx(:, :), recz(:, :), recp(:, :)
+  integer, allocatable :: recpos(:, :)
 
   integer :: n1, n2, isurf, npml, srctype, srcfunc, isnap
   real    :: dt, h, dts, apml, dtsnap
@@ -62,10 +62,10 @@ program main
   write(*, *) nt, nts, nt/nts+1, ntsnap
 
   !# >> Acquisition
-  call acqread(facqui, npml, h, nrec, recp)
+  call acqread(facqui, npml, h, nrec, recpos)
 
   !# >> Allocate recorded seismogram arrays
-  allocate(recx(nts, nrec), recz(nts, nrec))
+  allocate(recx(nts, nrec), recz(nts, nrec), recp(nts, nrec))
 
   !# >> Extend model dimensions with PML
   n1e = n1+2*npml
@@ -119,7 +119,7 @@ program main
 
   write(*, * ) 'EVOLUTION'
   call evolution(n1e, n2e, npml, h, dt, nt, nts, ntsnap, nrec, srctype, tsrc, &
-       gsrc, recx, recz, recp, tmod, isurf, &
+       gsrc, recx, recz, recp, recpos, tmod, isurf, &
        pmlx0, pmlx1, pmlz0, pmlz1, isnap)
 
   !# write seismos
@@ -130,9 +130,12 @@ program main
   open(42, file='recz.bin', access='direct', recl=nts*nrec*4)
   write(42, rec=1) recz
   close(42)
+  open(43, file='recp.bin', access='direct', recl=nts*nrec*4)
+  write(43, rec=1) recp
+  close(43)
 
-  call acqfree(recp)
-  deallocate(recx, recz)
+  call acqfree(recpos)
+  deallocate(recx, recz, recp)
 
   deallocate(tsrc, gsrc)
   deallocate(tmod%bux, tmod%buz)

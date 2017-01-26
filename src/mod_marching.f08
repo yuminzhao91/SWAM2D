@@ -68,19 +68,19 @@ module marching
 contains
   
   subroutine evolution(n1e, n2e, nsp, h,  dt, nt, nts, ntsnap, nrec, srctype, &
-       tsrc, gsrc, recx, recz, recp, tmod, isurf, &
+       tsrc, gsrc, recx, recz, recp, recpos, tmod, isurf, &
        pmlx0, pmlx1, pmlz0, pmlz1, isnap)
 
     type(typemod) :: tmod
 
-    integer :: it, n1e, n2e, nsp, nt, nts, nrec, its, ets, itsnap, ntsnap, isnap
+    integer :: i1, i2, it, n1e, n2e, nsp, nt, nts, nrec, its, ets, itsnap, ntsnap, isnap
     integer :: etsnap, ix, iz, irec, itt, srctype, isurf
     real :: start, finish
     real :: dt, tsrc(nt), gsrc(n1e, n2e), h, full
     real :: dth
-    
-    real :: recx(nts, nrec), recz(nts, nrec)
-    integer :: recp(nrec,2)
+
+    real :: recx(nts, nrec), recz(nts, nrec), recp(nts, nrec)
+    integer :: recpos(nrec, 2)
 
     real, allocatable :: ux(:, :), uz(:, :), txx(:, :), tzz(:, :), txz(:, :)
     real, allocatable :: uxx(:, :), uxz(:, :)
@@ -88,6 +88,8 @@ contains
     real, allocatable :: txxx(:, :), txxz(:, :)
     real, allocatable :: tzzx(:, :), tzzz(:, :)
     real, allocatable :: txzx(:, :), txzz(:, :)
+
+    real, allocatable :: press(:, :)
 
     real, allocatable :: d1(:, :), d2(:, :)
 
@@ -127,6 +129,9 @@ contains
     allocate(txxx(n1e, n2e), txxz(n1e, n2e))
     allocate(tzzx(n1e, n2e), tzzz(n1e, n2e))
     allocate(txzx(n1e, n2e), txzz(n1e, n2e))
+
+    ! >> Allocate pressure field
+    allocate(press(n1e, n2e))
 
     ! >> Initialize velocity fields (including splitted)
     ux(:, :) = 0.
@@ -192,6 +197,12 @@ contains
        call dirichlet( n1e, n2e, uxx, uxz, uzx, uzz)
        ! implement Dirichlet boundary conditions on the four edges of the grid
        
+       !# PRESSURE
+       do i2=1,n2e-1
+          do i1=2,n1e-1
+             press(i1, i2) = (-tmod%lbmu(i1, i2)/h)*(ux(i1,i2)-ux(i1,i2-1)+uz(i1,i2)-uz(i1-1,i2))
+          enddo
+       enddo
 
        !# TXX -- TZZ
        call dxbackward(ux, n1e, n2e, d2)
@@ -258,6 +269,10 @@ contains
              open(32, file=snapfile, access='direct', recl=n1e*n2e*4)
              write(32, rec=1) ux
              close(32)
+             write (snapfile, "(A9,I1)") "snapp0000", it
+             open(33, file=snapfile, access='direct', recl=n1e*n2e*4)
+             write(33, rec=1) press
+             close(33)
           else if(it >= 10 .and. it < 100)then
              write (snapfile, "(A8,I2)") "snapz000", it
              open(31, file=snapfile, access='direct', recl=n1e*n2e*4)
@@ -267,6 +282,10 @@ contains
              open(32, file=snapfile, access='direct', recl=n1e*n2e*4)
              write(32, rec=1) ux
              close(32)
+             write (snapfile, "(A8,I2)") "snapp000", it
+             open(33, file=snapfile, access='direct', recl=n1e*n2e*4)
+             write(33, rec=1) press
+             close(33)
           else if(it >= 100 .and. it < 1000)then
              write (snapfile, "(A7,I3)") "snapz00", it
              open(31, file=snapfile, access='direct', recl=n1e*n2e*4)
@@ -276,6 +295,10 @@ contains
              open(32, file=snapfile, access='direct', recl=n1e*n2e*4)
              write(32, rec=1) ux
              close(32)
+             write (snapfile, "(A7,I3)") "snapp00", it
+             open(33, file=snapfile, access='direct', recl=n1e*n2e*4)
+             write(33, rec=1) press
+             close(33)
           else if(it >= 1000 .and. it < 10000)then
              write (snapfile, "(A6,I4)") "snapz0", it
              open(31, file=snapfile, access='direct', recl=n1e*n2e*4)
@@ -285,6 +308,10 @@ contains
              open(32, file=snapfile, access='direct', recl=n1e*n2e*4)
              write(32, rec=1) ux
              close(32)
+             write (snapfile, "(A6,I4)") "snapp0", it
+             open(33, file=snapfile, access='direct', recl=n1e*n2e*4)
+             write(33, rec=1) press
+             close(33)
           end if
        else
           itsnap = itsnap+1
@@ -293,10 +320,11 @@ contains
        if(its == ets .or. it == 1)then
           its = 1
           do irec=1,nrec
-             ix = recp(irec, 1)
-             iz = recp(irec, 2) 
+             ix = recpos(irec, 1)
+             iz = recpos(irec, 2) 
              recx(itt, irec) = (ux(iz, ix)+ux(iz,ix-1))/2.
              recz(itt, irec) = (uz(iz, ix)+uz(iz-1,ix))/2.
+             recp(itt, irec) = press(iz, ix)
           end do
           itt = itt + 1
        else
@@ -316,8 +344,11 @@ contains
     ! >> Free stress fields
     deallocate(txx, tzz, txz)
 
-    !>> Free splitted stress fields
+    ! >> Free splitted stress fields
     deallocate(txxx, txxz, tzzx, tzzz, txzx, txzz)
+
+    ! >> Free pressure field
+    deallocate(press)
 
   end subroutine evolution
 
