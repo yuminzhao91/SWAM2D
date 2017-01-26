@@ -64,7 +64,7 @@
   \vskip -0.5em
   {\noindent \rule{\textwidth}{0.3em} \par}
 
-  {\hfill Documentation for SWAM2D version 0.2.0 \par}
+  {\hfill Documentation for SWAM2D version 1.0.0-rc \par}
   
   {\hfill 26 January 2017 \par}
   
@@ -100,7 +100,7 @@
 % ----------------------------------------------------------------------
 % THEORETICAL BACKGROUND
 % ----------------------------------------------------------------------
-\chapter{Theoretical background}
+\chapter{Method}
 
 \section{Governing equation}
 \index{governing equation}
@@ -109,10 +109,31 @@
 
 \begin{equation}
   \label{eq:motion}
-  \rho(x) \frac{\partial^{2}u_{i}}{\partial t^{2}} = \frac{\partial \tau_{ij}}{\partial x_{j}} + \rho(x)f_{i} ,
+  \rho(x) \frac{\partial^{2}u_{i}}{\partial t^{2}} = \frac{\partial \tau_{ik}}{\partial x_{k}} + \rho(x)f_{i} ,
 \end{equation}
 
 \noindent where $x=(x,y,z)$ is the position vector, $u$ is the displacement, $\tau_{ij}$ is the stress tensor, $\rho(x)$ is the density and $f=(f_{x}, f_{y}, f_{z})$ is the a volumetric force.\\
+
+\noindent The stress tensor $\tau$, which allows to describe the elastic medium, is lineary relied to the strain tensor $\epsilon$ through the fourth-rank elastic tensor $C_{ijkl}$. This linear relation, called generalized Hooke's law,  is defined as follow:
+
+\begin{equation}
+  \label{eq:hooke}
+  \tau_{ij} = C_{ijkl}\epsilon_{kl}\ ,
+\end{equation} 
+
+\noindent where
+
+\begin{equation}
+  \label{eq:elastic-tensor}
+  C_{ijkl} = \lambda \delta_{ij} \delta_{kl} + \mu (\delta_{ik}\delta_{jl}+\delta_{il}\delta_{jk})\ .
+\end{equation}
+
+\noindent The strain tensor corresponds to the symetric part of the displacement derivatives with respect to space, \textit{i.e.} to the deformation of the elastic body such as:
+
+\begin{equation}
+  \label{eq:strain-tensor}
+  \epsilon_{ij} = \frac{1}{2} \left( \frac{\partial u_{j}}{\partial x_{i}} + \frac{\partial u_{i}}{\partial x_{j}} \right)\ .
+\end{equation}
 
 \noindent Second order hyperbolic system, called displacement-stress formulation:
 
@@ -184,8 +205,9 @@
 \index{absorbing boundary condition}
 \index{free surface condition}
 
-\subsection{Perfectly Matched Layer (PML)}
+\subsection{PML absorbing boundary conditions}
 \index{perfectly matched layer}
+\index{absorbing boundary conditions}
 
 \cite{berenger1994perfectly}
 
