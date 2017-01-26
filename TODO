@@ -2,11 +2,6 @@ FDPSV -- TODO
 
 Todo:
     * validations for non-homogeneous medium
-    * check signal and snapshot recording
-    * fdpsv-1D
-    * body force implementation
-    * wavefield interpolation procedure
-    * sparse snapshots
     * attenuation
     * anisotropic materials
     * solid/fluid interface
