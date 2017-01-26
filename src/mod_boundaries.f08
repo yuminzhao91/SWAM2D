@@ -1,4 +1,22 @@
 !------------------------------------------------------------------------------
+! LICENSE
+!------------------------------------------------------------------------------
+! This file is part of SWAM2D.
+!
+! SWAM2D is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+!
+! SWAM2D is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+! GNU General Public License for more details.
+!
+! You should have received a copy of the GNU General Public License
+! along with SWAM2D. If not, see <http://www.gnu.org/licenses/>.
+!------------------------------------------------------------------------------
+!------------------------------------------------------------------------------
 ! MODULE: boundaries
 !------------------------------------------------------------------------------
 !> \brief subroutines to read, to extend and calculate physical parameter
@@ -58,52 +76,31 @@ contains
     
   end subroutine pmlmod
 
+  subroutine dirichlet(n1e, n2e, uxx, uxz, uzx, uzz)
+    ! implement Dirichlet boundary conditions on the four edges of the grid
+    integer :: n1e, n2e
+    real, dimension(n1e,n2e) :: uxx, uxz, uzx, uzz
+
+    uxx(1, :) = 0.
+    uxx(n1e, :)= 0.
+    uxx(:, 1) = 0.
+    uxx(:, n2e)= 0.
+
+    uxz(1, :) = 0.
+    uxz(n1e, :)= 0.
+    uxz(:, 1) = 0.
+    uxz(:, n2e)= 0.
+    
+    uzx(1, :) = 0.
+    uzx(n1e, :)= 0.
+    uzx(:, 1) = 0.
+    uzx(:, n2e)= 0.
+    
+    uzz(1, :) = 0.
+    uzz(n1e, :)= 0.
+    uzz(:, 1) = 0.
+    uzz(:, n2e)= 0.
+    
+  end subroutine dirichlet
   
-  subroutine sponges(nsp, fac, h, spg)
-    
-    integer :: i, nsp
-    real :: fac, h, spg(3, nsp+1), q
-
-    fac = acos(fac)/(float(nsp)*h)
-
-    spg(:, : ) = 0.
-
-    do i=1,nsp+1
-       spg(1, i) = cos(fac*(float(nsp-i+1)*h))
-       spg(2, i) = cos(fac*(float(nsp-i+1)*h-h/2.))
-       spg(3, i) = cos(fac*(float(nsp-i+1)*h+h/2.))
-       !q = float(nsp-i+1)*h
-       !spg(1, i) = 1.-(5*(600./(float(nsp+1)*h))*(q/(float(nsp+1)*h))*(q/(float(nsp+1)*h)))
-       !spg(2, i) = 1.-(5*(600./(float(nsp+1)*h))*(q/(float(nsp+1)*h))*(q/(float(nsp+1)*h)))
-       !spg(3, i) = 1.-(5*(600./(float(nsp+1)*h))*(q/(float(nsp+1)*h))*(q/(float(nsp+1)*h)))
-    end do
-    
-    spg(2, nsp) = 1.
-
-  end subroutine sponges
-
-  subroutine addpmlx(n1e, n2e, nsp, spga, spgb, u)
-
-    integer :: i, n1e, n2e, nsp
-    real :: spga(nsp+1), spgb(nsp+1), u(n1e, n2e)
-
-    do i=1,nsp+1
-       u(:, i) = u(:, i) * spga(i)
-       u(:, n2e-i) = u(:, n2e-i) * spgb(i)
-    end do
-
-  end subroutine addpmlx
-
-  subroutine addpmlz(n1e, n2e, nsp, spga, spgb, u, isurf)
-
-    integer :: i, n1e, n2e, nsp, isurf
-    real :: spga(nsp+1), spgb(nsp+1), u(n1e, n2e)
-
-    do i=1,nsp+1
-       if(isurf == 0) u(i, :) = u(i, :) *spga(i)
-       u(n1e-i, :) = u(n1e-i, :) * spgb(i)
-    end do
-
-  end subroutine addpmlz
-
 end module boundaries

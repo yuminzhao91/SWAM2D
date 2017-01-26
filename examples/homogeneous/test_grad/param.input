@@ -1,0 +1,18 @@
+#[run]
+test
+2.0 0.00025
+#[materials]
+fvp.bin fvs.bin fro.bin
+121 601 0.5
+#[boundaries]
+0 10 5. 2
+#[source]
+1 2 -1
+30. 0.05
+5. 10. 
+#[receiver]
+acquisition.dat
+0.00025
+#[snapshot]
+1
+0.00025

@@ -1,4 +1,5 @@
 \documentclass{gnulike}
+
 \usepackage{natbib}
 \usepackage{graphics}
 \usepackage{chngcntr}
@@ -6,18 +7,28 @@
 \usepackage{rotating}
 \usepackage{emptypage}
 \usepackage[titletoc]{appendix}
+\usepackage{multicol}
 
 \let\leqslant=\leq
 
 \DeclareMathSizes{10}{10}{10}{10}
 
 \definecolor{light-gray}{gray}{0.95}
-\definecolor{bashgray}{RGB}{209,214,217}
+\definecolor{bashgray}{RGB}{211,215,207}
+\definecolor{bashgray2}{RGB}{238,238,236}
 \newcommand{\addbash}[1]{
 	\begin{center}
-	\colorbox{bashgray}{\begin{minipage}{0.9\textwidth}
+	\fcolorbox{aluminium3}{aluminium1}{\begin{minipage}{0.9\textwidth}
   	\ttfamily \$ #1
 \end{minipage}}
+	\end{center}
+}
+
+\newcommand{\addbox}[1]{
+	\begin{center}
+	\fcolorbox{aluminium3}{aluminium1}{\begin{minipage}{0.98\columnwidth}
+  	#1
+        \end{minipage}}
 	\end{center}
 }
 
@@ -130,7 +141,7 @@
 \section{Staggered-grid scheme}
 \index{staggered-grid scheme}
 
-\cite{virieux1986psv,levander1988fourth}
+\cite{virieux1986psv,levander1988fourth,bohlen2006accuracy}
 
 \begin{figure}[!ht]
   \centering
@@ -164,6 +175,11 @@
   \rho_{z}(i+\frac{1}{2},j) = \frac{1}{2}(\rho (i+1,j)+\rho(i,j))
 \end{eqnarray}
 
+\begin{figure}[!ht]
+  \centering
+  \includegraphics[scale=1.0]{fig/validation_dispersion.eps}
+\end{figure}
+
 \section{Initial and boundary conditions}
 \index{absorbing boundary condition}
 \index{free surface condition}
@@ -173,6 +189,11 @@
 
 \cite{berenger1994perfectly}
 
+\begin{figure}[!ht]
+  \centering
+  \includegraphics[scale=1.0]{fig/validation_pml.eps}
+\end{figure}
+
 \begin{eqnarray}
 \label{pml-damp}
 d = d_{0} \left( \frac{q}{L_{PML}} \right) ^{n} \\
@@ -181,6 +202,12 @@ d_{0} = Ac_{p} \frac{log(1/R)}{2L_{PML}}
 
 \subsection{Free surface}
 \index{free surface}
+
+\begin{figure}[!ht]
+  \centering
+  \includegraphics[scale=1.0]{fig/validation_fsurf.eps}
+  \caption{Free surface. Left: vacuum approach. Right: image theory approach.}
+\end{figure}
 
 % ----------------------------------------------------------------------
 % GETTING STARTED
