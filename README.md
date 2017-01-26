@@ -1,2 +1,2 @@
-# SWAM2D 0.2.0 (alpha)
+# SWAM2D 1.0.0 (release candidate)
 Seismic WAve Modeling in 2D
