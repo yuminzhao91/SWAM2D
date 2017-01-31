@@ -109,24 +109,26 @@
 
 \begin{equation}
   \label{eq:motion}
-  \rho(x) \frac{\partial^{2}u_{i}}{\partial t^{2}} = \frac{\partial \tau_{ik}}{\partial x_{k}} + \rho(x)f_{i} ,
+  \rho(x) \frac{\partial^{2}u_{i}}{\partial t^{2}} = \frac{\partial \sigma_{ik}}{\partial x_{k}} + \rho(x)f_{i} ,
 \end{equation}
 
-\noindent where $x=(x,y,z)$ is the position vector, $u$ is the displacement, $\tau_{ij}$ is the stress tensor, $\rho(x)$ is the density and $f=(f_{x}, f_{y}, f_{z})$ is the a volumetric force.\\
+\noindent where $x=(x,y,z)$ is the position vector, $u$ is the displacement, $\sigma_{ij}$ is the stress tensor, $\rho(x)$ is the density and $f=(f_{x}, f_{y}, f_{z})$ is the a volumetric force.\\
 
-\noindent The stress tensor $\tau$, which allows to describe the elastic medium, is lineary relied to the strain tensor $\epsilon$ through the fourth-rank elastic tensor $C_{ijkl}$. This linear relation, called generalized Hooke's law,  is defined as follow:
+\noindent The stress tensor $\sigma$, which allows to describe the elastic medium, is lineary relied to the strain tensor $\epsilon$ through the fourth-rank elastic tensor $C_{ijkl}$. This linear relation, called generalized Hooke's law,  is defined as follow:
 
 \begin{equation}
   \label{eq:hooke}
-  \tau_{ij} = C_{ijkl}\epsilon_{kl}\ ,
+  \sigma_{ij} = C_{ijkl}\epsilon_{kl}\ ,
 \end{equation} 
 
 \noindent where
 
 \begin{equation}
   \label{eq:elastic-tensor}
-  C_{ijkl} = \lambda \delta_{ij} \delta_{kl} + \mu (\delta_{ik}\delta_{jl}+\delta_{il}\delta_{jk})\ .
+  C_{ijkl} = \lambda \delta_{ij} \delta_{kl} + \mu (\delta_{ik}\delta_{jl}+\delta_{il}\delta_{jk})\ ,
 \end{equation}
+
+\noindent where $\delta$ is the Kronehker symbol and $\lambda$ and $\mu$ are the Lam\'e parameters.\\
 
 \noindent The strain tensor corresponds to the symetric part of the displacement derivatives with respect to space, \textit{i.e.} to the deformation of the elastic body such as:
 
@@ -135,28 +137,34 @@
   \epsilon_{ij} = \frac{1}{2} \left( \frac{\partial u_{j}}{\partial x_{i}} + \frac{\partial u_{i}}{\partial x_{j}} \right)\ .
 \end{equation}
 
-\noindent Second order hyperbolic system, called displacement-stress formulation:
+\noindent Combining equations \ref{eq:hooke}, \ref{eq:elastic-tensor} and \ref{eq:strain-tensor}, and injecting the result in equation \ref{eq:motion} leasd to the second order hyperbolic system, called displacement-stress formulation:
 
 \index{displacement-stress formulation}
 \begin{eqnarray}
   \label{eq:displacement-stress}
-  \frac{\partial ^{2} u_{x}}{\partial t^{2}} = \rho^{{\scriptscriptstyle-1}} \left( \frac{\partial \tau_{xx}}{\partial x} + \frac{\partial \tau_{xz}}{\partial z} \right) \nonumber \\
-  \frac{\partial ^{2} u_{z}}{\partial t^{2}} = \rho^{{\scriptscriptstyle -1}} \left( \frac{\partial \tau_{xz}}{\partial x} + \frac{\partial \tau_{zz}}{\partial z} \right) \nonumber \\
-  \tau_{xx} = (\lambda+2\mu)\frac{\partial u_{x}}{\partial x} + \lambda \frac{\partial u_{z}}{\partial z} \\
-  \tau_{zz}= (\lambda+2\mu)\frac{\partial u_{z}}{\partial z} + \lambda \frac{\partial u_{x}}{\partial x} \nonumber \\
-  \tau_{xz} = \mu \left( \frac{\partial u_{x}}{\partial z} + \frac{\partial u_{z}}{\partial x } \right) \nonumber
+  \frac{\partial ^{2} u_{x}}{\partial t^{2}} = \rho^{{\scriptscriptstyle-1}} \left( \frac{\partial \sigma_{xx}}{\partial x} + \frac{\partial \sigma_{xz}}{\partial z} \right)\ , \nonumber \\
+  \frac{\partial ^{2} u_{z}}{\partial t^{2}} = \rho^{{\scriptscriptstyle -1}} \left( \frac{\partial \sigma_{xz}}{\partial x} + \frac{\partial \sigma_{zz}}{\partial z} \right)\ ,
+\end{eqnarray}
+
+\noindent where:
+
+\begin{eqnarray}
+  \label{eq:displacement-stress-2}
+  \sigma_{xx} = (\lambda+2\mu)\frac{\partial u_{x}}{\partial x} + \lambda \frac{\partial u_{z}}{\partial z}\ , \nonumber \\
+  \sigma_{zz}= (\lambda+2\mu)\frac{\partial u_{z}}{\partial z} + \lambda \frac{\partial u_{x}}{\partial x}\ , \\
+  \sigma_{xz} = \mu \left( \frac{\partial u_{x}}{\partial z} + \frac{\partial u_{z}}{\partial x } \right)\ . \nonumber
 \end{eqnarray}\\
 
-\noindent First-order hyperbolic system, called velocity-stress formulation:
+\noindent This system can be expressed in term of velocity instead of displacement which leads to the first-order hyperbolic system, called velocity-stress formulation:
 
 \index{velocity-stress formulation}
 \begin{eqnarray}
   \label{eq:velocity-stress}
-  \frac{\partial v_{x}}{\partial t} = \rho^{{\scriptscriptstyle-1}} \left( \frac{\partial \tau_{xx}}{\partial x} + \frac{\partial \tau_{xz}}{\partial z} \right) \nonumber \\
-  \frac{\partial v_{z}}{\partial t} = \rho^{{\scriptscriptstyle -1}} \left( \frac{\partial \tau_{xz}}{\partial x} + \frac{\partial \tau_{zz}}{\partial z} \right) \nonumber \\
-  \frac{\partial \tau_{xx}}{\partial t} = (\lambda+2\mu)\frac{\partial v_{x}}{\partial x} + \lambda \frac{\partial v_{z}}{\partial z} \\
-  \frac{\partial \tau_{zz}}{\partial t} = (\lambda+2\mu)\frac{\partial v_{z}}{\partial z} + \lambda \frac{\partial v_{x}}{\partial x} \nonumber \\
-  \frac{\partial \tau_{xz}}{\partial t} = \mu \left( \frac{\partial v_{x}}{\partial z} + \frac{\partial v_{z}}{\partial x } \right) \nonumber
+  \frac{\partial v_{x}}{\partial t} = \rho^{{\scriptscriptstyle-1}} \left( \frac{\partial \sigma_{xx}}{\partial x} + \frac{\partial \sigma_{xz}}{\partial z} \right) \nonumber \\
+  \frac{\partial v_{z}}{\partial t} = \rho^{{\scriptscriptstyle -1}} \left( \frac{\partial \sigma_{xz}}{\partial x} + \frac{\partial \sigma_{zz}}{\partial z} \right) \nonumber \\
+  \frac{\partial \sigma_{xx}}{\partial t} = (\lambda+2\mu)\frac{\partial v_{x}}{\partial x} + \lambda \frac{\partial v_{z}}{\partial z} \\
+  \frac{\partial \sigma_{zz}}{\partial t} = (\lambda+2\mu)\frac{\partial v_{z}}{\partial z} + \lambda \frac{\partial v_{x}}{\partial x} \nonumber \\
+  \frac{\partial \sigma_{xz}}{\partial t} = \mu \left( \frac{\partial v_{x}}{\partial z} + \frac{\partial v_{z}}{\partial x } \right) \nonumber
 \end{eqnarray}
 
 \section{Staggered-grid scheme}
