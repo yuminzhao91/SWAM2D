@@ -181,15 +181,20 @@
 
 \section{Discretization}
 
-\noindent Second order forward ($D^{+}$) and backward ($D^{-}$) operators:
+\noindent Given the use of the staggered-grid scheme to discretize the space, forward and backward finite-difference operators are use to solve the velocity-stress equations.\\
+
+%\noindent Second order forward ($D^{+}$) and backward ($D^{-}$) operators:
+%\index{forward operator}
+%\index{backward operator}
+%\begin{eqnarray}
+%  D^{+}=f(i+1)-f(i) \nonumber \\
+%  D^{-}=f(i)-f(i-1)
+%\end{eqnarray}
+
+\noindent The fourth-order forward ($D^{+}$) and backward ($D^{-}$) operators are widely used and are defined, in 1D, as:
 \index{forward operator}
 \index{backward operator}
-\begin{eqnarray}
-  D^{+}=f(i+1)-f(i) \nonumber \\
-  D^{-}=f(i)-f(i-1)
-\end{eqnarray}
 
-\noindent Fourth-order forward ($D^{+}$) and backward ($D^{-}$) operators:
 \begin{eqnarray}
   D^{+}=c_{1}[f(i+1)-f(i)]+c_{2}[f(i+2)-f(i-1)] \nonumber \\
   D^{-}=c_{1}[f(i)-f(i-1)]+c_{2}[f(i+1)-f(i-2)]
@@ -204,9 +209,12 @@
   \rho_{z}(i+\frac{1}{2},j) = \frac{1}{2}(\rho (i+1,j)+\rho(i,j))
 \end{eqnarray}
 
+\clearpage\newpage
 \begin{figure}[!ht]
   \centering
   \includegraphics[scale=1.0]{fig/validation_dispersion.eps}
+  \caption{Comparison between (left) a modeling using a suitable number of grid points per wavelenght and (right) a modeling using unsufficient nomber of grid points per wavelenght.}
+  \label{fig:dispersion-validation}
 \end{figure}
 
 \section{Initial and boundary conditions}
@@ -217,26 +225,37 @@
 \index{perfectly matched layer}
 \index{absorbing boundary conditions}
 
-\cite{berenger1994perfectly}
+\noindent At the scale of seismic exploration and less, the target area (\textit{i.e.} the model), is a semi-infinite space bounded only at the top by a free surface. It is thus necessary to simulate a infinite medium at the lateral and bottom boundary. This can be achieve using the \textit{Perfectly matched layer} (PML) absorbing boundaries. PML were initially developed in the framework of electro-magentic modeling by \cite{berenger1994perfectly} and was quickly adopted in seismic modeling.\\
 
+\noindent In the time domain, PML can be defined as:
+
+\begin{eqnarray}
+\label{eq:pml-equations}
+d = d_{0} \left( \frac{q}{L_{PML}} \right) ^{n}\ , \\
+d_{0} = Ac_{p} \frac{log(1/R)}{2L_{PML}}\ ,
+\end{eqnarray}
+
+\noindent where $q$ is the distance from PML intern boundary, $L_{PML}$ is the width of the PML, $A$ is the amplitude of the PML, $c_{p}$ is the P-wave velocity and $R$ is a reflection coefficient generally low.\\
+
+\noindent Figure \ref{fig:validation-pml} demonstrate the importance of absorbing boundary conditions and the efficiency of PML. PML are parametrized following recommandations of (CITE KOMATITSCH, FESTA HERE): $A=3$ and $R=0.01$. In this example, the PML are $20\ m$ wide (40 grid points).
 \begin{figure}[!ht]
   \centering
   \includegraphics[scale=1.0]{fig/validation_pml.eps}
+  \caption{Comparison of (left column) snapshots for a model without PML ($A=0$) and (right column) snapshots for a model with PML ($A=3$) applied to each boundary. Black dashed line defined the limits between PML and physical model.}
+  \label{fig:validation-pml}
 \end{figure}
-
-\begin{eqnarray}
-\label{pml-damp}
-d = d_{0} \left( \frac{q}{L_{PML}} \right) ^{n} \\
-d_{0} = Ac_{p} \frac{log(1/R)}{2L_{PML}}
-\end{eqnarray}
 
 \subsection{Free surface}
 \index{free surface}
 
+\noindent As discussed in the previous subsection, the earth structures must be considered as semi-infite space due to the presence of a free surface defined by the topography. Given the strong formulation of the wave equation used by finite-difference methods, the free surface must be explicitly defined.\\
+
+\noindent Two popular methods are the vaccum approach and the image theory approach.
+
 \begin{figure}[!ht]
   \centering
   \includegraphics[scale=1.0]{fig/validation_fsurf.eps}
-  \caption{Free surface. Left: vacuum approach. Right: image theory approach.}
+  \caption{Two possible approach to implement free surface: (left) the vacuum approach and (right) the image theory approach.}
 \end{figure}
 
 % ----------------------------------------------------------------------
