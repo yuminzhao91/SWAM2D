@@ -137,7 +137,7 @@
   \epsilon_{ij} = \frac{1}{2} \left( \frac{\partial u_{j}}{\partial x_{i}} + \frac{\partial u_{i}}{\partial x_{j}} \right)\ .
 \end{equation}
 
-\noindent Combining equations \ref{eq:hooke}, \ref{eq:elastic-tensor} and \ref{eq:strain-tensor}, and injecting the result in equation \ref{eq:motion} leasd to the second order hyperbolic system, called displacement-stress formulation:
+\noindent Combining equations \ref{eq:hooke}, \ref{eq:elastic-tensor} and \ref{eq:strain-tensor}, and injecting the result in equation \ref{eq:motion} leads to the second order hyperbolic system, called displacement-stress formulation. In 2D, where all derivative with respect to $y$ vanishes, the displacement-stress formulation is:
 
 \index{displacement-stress formulation}
 \begin{eqnarray}
@@ -217,6 +217,13 @@
   \label{fig:dispersion-validation}
 \end{figure}
 
+\begin{figure}[!ht]
+  \centering
+  \includegraphics[scale=1.0]{fig/validation_courant.eps}
+  \caption{.}
+  \label{fig:courant-validation}
+\end{figure}
+
 \section{Initial and boundary conditions}
 \index{absorbing boundary condition}
 \index{free surface condition}
@@ -241,7 +248,7 @@ d_{0} = Ac_{p} \frac{log(1/R)}{2L_{PML}}\ ,
 \begin{figure}[!ht]
   \centering
   \includegraphics[scale=1.0]{fig/validation_pml.eps}
-  \caption{Comparison of (left column) snapshots for a model without PML ($A=0$) and (right column) snapshots for a model with PML ($A=3$) applied to each boundary. Black dashed line defined the limits between PML and physical model.}
+  \caption{Comparison of (left column) snapshots of the pressure wavefield for a model without PML ($A=0$) and (right column) snapshots of the pressure wavefield for a model with PML ($A=3$) applied to each boundary. Black dashed line defined the limits between PML and physical model.}
   \label{fig:validation-pml}
 \end{figure}
 
@@ -309,6 +316,13 @@ d_{0} = Ac_{p} \frac{log(1/R)}{2L_{PML}}\ ,
 % NUMERICAL EXAMPLES
 % ----------------------------------------------------------------------
 \chapter{Numerical examples}
+
+\section{Weathered model}
+
+\section{Corner-edge model}
+
+\section{Advanced model}
+
 
 % ----------------------------------------------------------------------
 % APPENDICES

@@ -19,37 +19,30 @@ params = {'backend': 'PS',
           'font.size' : 11,
           'font.weight' : 'bold',
           'axes.labelsize' : 11,
-          'axes.weight' : 11,
-          'text.fontsize' : 11,
-          'tick.serif' : 'serif',
-          'label.family' : 'serif',
-          'xtick.family': 'serif',
           'xtick.labelsize' : 11,
-          'ytick.labelsize' : 11,
-          'xtick.weight' : 'bold',
-          'ytick.weight' : 'bold'
+          'ytick.labelsize' : 11
           }
 
 # >> Apply parametrization
 plt.rcParams.update(params)
 
 # >> Read input binary files
-disp1s00801 = np.fromfile('validation_dispersion1/snapz00801', dtype=np.float32)
+disp1s00801 = np.fromfile('validation_dispersion1/snapp00801', dtype=np.float32)
 disp1s00801 = disp1s00801.reshape(481, 481).swapaxes(1,0)
 
-disp1s01201 = np.fromfile('validation_dispersion1/snapz01201', dtype=np.float32)
+disp1s01201 = np.fromfile('validation_dispersion1/snapp01201', dtype=np.float32)
 disp1s01201 = disp1s01201.reshape(481, 481).swapaxes(1,0)
 
-disp1s01601 = np.fromfile('validation_dispersion1/snapz01601', dtype=np.float32)
+disp1s01601 = np.fromfile('validation_dispersion1/snapp01601', dtype=np.float32)
 disp1s01601 = disp1s01601.reshape(481, 481).swapaxes(1,0)
 
-disp0s00801 = np.fromfile('validation_dispersion0/snapz00801', dtype=np.float32)
+disp0s00801 = np.fromfile('validation_dispersion0/snapp00801', dtype=np.float32)
 disp0s00801 = disp0s00801.reshape(121, 121).swapaxes(1,0)
 
-disp0s01201 = np.fromfile('validation_dispersion0/snapz01201', dtype=np.float32)
+disp0s01201 = np.fromfile('validation_dispersion0/snapp01201', dtype=np.float32)
 disp0s01201 = disp0s01201.reshape(121, 121).swapaxes(1,0)
 
-disp0s01601 = np.fromfile('validation_dispersion0/snapz01601', dtype=np.float32)
+disp0s01601 = np.fromfile('validation_dispersion0/snapp01601', dtype=np.float32)
 disp0s01601 = disp0s01601.reshape(121, 121).swapaxes(1,0)
 
 font1 = plt.figure(figsize=(7.0,9.0))
@@ -82,7 +75,7 @@ fig1.tick_params(axis='x')
 fig1.tick_params(axis='y')
 fig1.set_title(r"\bf grid points per wavelenght $>$ 4")
 fig1.text(5., 195., r"\bf t=0.2s", fontsize=10)
-fig1.imshow(disp1s00801, cmap='gray', aspect='equal', extent=[-20,220,220,-20], vmin=-5.0e-11, vmax=5.0e-11)
+fig1.imshow(disp1s00801, cmap='gray', aspect='equal', extent=[-20,220,220,-20], vmin=-5.0e-3, vmax=5.0e-3)
 
 fig2 = font1.add_subplot(3,2,2)
 fig2.set_xlabel(r" ") #Distance [m]")
@@ -94,7 +87,7 @@ fig2.tick_params(axis='y')
 fig2.text(5., 195., r"\bf t=0.2s", fontsize=10)
 fig2.set_title(r"\bf grid points per wavelenght $<$ 4")
 
-fig2.imshow(disp0s00801, cmap='gray', aspect='equal', extent=[-20,220,220,-20], vmin=-5.0e-11, vmax=5.0e-11)
+fig2.imshow(disp0s00801, cmap='gray', aspect='equal', extent=[-20,220,220,-20], vmin=-5.0e-3, vmax=5.0e-3)
 
 fig3 = font1.add_subplot(3,2,3)
 fig3.set_xlabel(r" ") #Distance [m]")
@@ -104,7 +97,7 @@ fig3.set_yticks(y)
 fig3.tick_params(axis='x')
 fig3.tick_params(axis='y')
 fig3.text(5., 195., r"\bf t=0.3s", fontsize=10)
-fig3.imshow(disp1s01201, cmap='gray', aspect='equal', extent=[-20,220,220,-20], vmin=-5.0e-11, vmax=5.0e-11)
+fig3.imshow(disp1s01201, cmap='gray', aspect='equal', extent=[-20,220,220,-20], vmin=-5.0e-3, vmax=5.0e-3)
 
 fig4 = font1.add_subplot(3,2,4)
 fig4.set_xlabel(r" ") #Distance [m]")
@@ -114,7 +107,7 @@ fig4.set_yticks(y)
 fig4.tick_params(axis='x')
 fig4.tick_params(axis='y')
 fig4.text(5., 195., r"\bf t=0.3s", fontsize=10)
-fig4.imshow(disp0s01201, cmap='gray', aspect='equal', extent=[-20,220,220,-20], vmin=-5.0e-11, vmax=5.0e-11)
+fig4.imshow(disp0s01201, cmap='gray', aspect='equal', extent=[-20,220,220,-20], vmin=-5.0e-3, vmax=5.0e-3)
 
 fig5 = font1.add_subplot(3,2,5)
 fig5.set_xlabel(r"Distance [m]")
@@ -124,7 +117,7 @@ fig5.set_yticks(y)
 fig5.tick_params(axis='x')
 fig5.tick_params(axis='y')
 fig5.text(5., 195., r"\bf t=0.4s", fontsize=10)
-fig5.imshow(disp1s01601, cmap='gray', aspect='equal', extent=[-20,220,220,-20], vmin=-5.0e-11, vmax=5.0e-11)
+fig5.imshow(disp1s01601, cmap='gray', aspect='equal', extent=[-20,220,220,-20], vmin=-5.0e-3, vmax=5.0e-3)
 
 fig6 = font1.add_subplot(3,2,6)
 fig6.set_xlabel(r"Distance [m]")
@@ -134,7 +127,7 @@ fig6.set_yticks(y)
 fig6.tick_params(axis='x')
 fig6.tick_params(axis='y')
 fig6.text(5., 195., r"\bf t=0.4s", fontsize=10)
-fig6.imshow(disp0s01601, cmap='gray', aspect='equal', extent=[-20,220,220,-20], vmin=-5.0e-11, vmax=5.0e-11)
+fig6.imshow(disp0s01601, cmap='gray', aspect='equal', extent=[-20,220,220,-20], vmin=-5.0e-3, vmax=5.0e-3)
 
 
 font1.savefig('validation_dispersion.ps')
