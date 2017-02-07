@@ -102,7 +102,7 @@ program main
 
   !# >> Calculate PMLs
   call pmlmod(tmod%vpe, n1e, n2e, h, npml, apml, ppml, &
-       pmlx0, pmlx1, pmlz0, pmlz1)
+       pmlx0, pmlx1, pmlz0, pmlz1, isurf)
   
   !# >> Deallocate model matrices
   deallocate(tmod%vp, tmod%vs, tmod%ro)

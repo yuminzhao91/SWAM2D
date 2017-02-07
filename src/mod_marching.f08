@@ -99,7 +99,6 @@ contains
     ! >> ADDING PML TEMP. IN MARCHING MOD
     real, dimension(n1e, n2e) :: pmlx0, pmlx1, pmlz0, pmlz1
 
-
     !open(901, file='test_pmlz0.bin', access='direct', recl=n1e*n2e*4)
     !write(901, rec=1) pmlz0
     !close(901)
