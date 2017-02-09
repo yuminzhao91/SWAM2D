@@ -99,19 +99,11 @@ contains
     ! >> ADDING PML TEMP. IN MARCHING MOD
     real, dimension(n1e, n2e) :: pmlx0, pmlx1, pmlz0, pmlz1
 
-    !open(901, file='test_pmlz0.bin', access='direct', recl=n1e*n2e*4)
-    !write(901, rec=1) pmlz0
-    !close(901)
-
-    !open(902, file='test_pmlz1.bin', access='direct', recl=n1e*n2e*4)
-    !write(902, rec=1) pmlz1
-    !close(902)
-
     ! >> END PML
    
     dth = dt/h
     
-    write(*, *) 'EVOLUTION ALLOCATION'
+    ! >> Allocate derivative arrays
     allocate(d1(n1e, n2e), d2(n1e, n2e))
 
     ! >> Allocate velocity fields
@@ -162,9 +154,6 @@ contains
     ! >> Start marching
     do it=1,nt
        call cpu_time(start)
-
-       !# UX
-       !# dux/dut = (1/rho)[dtxx/dx+dtxz/dz]
        
        call dxforward(txx, n1e, n2e, d2)
        call dzbackward(txz, n1e, n2e, d1)
@@ -172,10 +161,12 @@ contains
        uxx(:, :) = (((1./dt-pmlx1(:,:))*uxx(:, :)+(1./h)*tmod%bux(:, :)*d2(:, :))/(1./dt+pmlx1(:, :)))
        uxz(:, :) = (((1./dt-pmlz0(:,:))*uxz(:, :)+(1./h)*tmod%bux(:, :)*d1(:, :))/(1./dt+pmlz0(:, :)))
        ux(:, :) = uxx(:, :)+uxz(:, :)
-       if(isurf == 1)then
-          ux(1:nsp,:) = 0.
-       end if
-       
+       if( isurf == 1)then
+          ux(1:nsp, :) = 0. !-1.*tmod%lb0(nsp+1,:)/tmod%lbmu(nsp+1,:)*uxx(nsp+1,:)  
+          ux(nsp,:) = -ux(nsp+2,:)
+          ux(nsp-1,:) = -ux(nsp+3,:)
+       endif
+
        !# UZ
        call dxbackward(txz, n1e, n2e, d2)
        call dzforward(tzz, n1e, n2e, d1)
@@ -186,12 +177,21 @@ contains
        else
           uzx(:, :) = (((1./dt-pmlx0(:,:))*uzx(:, :)+(1./h)*tmod%buz(:, :)*d2(:, :))/(1./dt+pmlx0(:, :)))
        end if
+
        uzz(:, :) = (((1./dt-pmlz1(:,:))*uzz(:, :)+(1./h)*tmod%buz(:, :)*d1(:, :))/(1./dt+pmlz1(:, :)))
 
        uz(:, :) = uzx(:, :)+uzz(:, :)
-       if(isurf == 1)then
-          uz(1:nsp,:) = 0.
-       end if
+
+       if( isurf == 1)then
+          uz(1:nsp, :) = 0. !-1.*tmod%lb0(nsp+1,:)/tmod%lbmu(nsp+1,:)*uxx(nsp+1,:)  
+          ux(nsp,:) = -ux(nsp+2,:)
+          ux(nsp-1,:) = -ux(nsp+3,:)
+       endif
+       
+       
+       !if(isurf == 1)then
+       !   uzz(:, :) = (((1./dt-pmlz1(:,:))*uzz(:, :)-1.*tmod%lb0(nsp+1,:)/tmod%lbmu(nsp+1,:)*uxx/(1./dt+pmlz1(:, :))))
+       !end if
        
        call dirichlet( n1e, n2e, uxx, uxz, uzx, uzz)
        ! implement Dirichlet boundary conditions on the four edges of the grid
@@ -217,7 +217,8 @@ contains
 
        txx(:, :) = txxx(:, :) + txxz(:, :)
        if(isurf == 1)then
-          txx(nsp+1, :) = txxx(nsp+1, :)
+          txx(nsp+1, :) = txxx(nsp+1,:)-dt*tmod%lb0(nsp+1,:)/tmod%lbmu(nsp+1,:)*d2(nsp+1,:) 
+          !4.*(tmod%lb0(nsp+1,:)*tmod%mue(nsp+1,:)+tmod%mue(nsp+1,:)**2)             / (tmod%lbmu(nsp+1,:))*uxx(nsp+1,:) !txxx(nsp+1, :)
        end if
        
        if(srctype == 0 .or. srctype == 1)then
@@ -227,15 +228,23 @@ contains
           tzzx(:, :) = (((1./dt-pmlx0(:,:))*tzzx(:, :)+(1./h)*tmod%lb0(:, :)*d2(:, :))/(1./dt+pmlx0(:, :)))
        end if
        tzzz(:, :) = (((1./dt-pmlz0(:,:))*tzzz(:, :)+(1./h)*tmod%lbmu(:, :)*d1(:, :))/(1./dt+pmlz0(:, :)))
-       if(isurf == 1)then
-          tzzx(nsp+1,:) = 0.
-          tzzz(nsp+1,:) = 0.
-          tzzx(nsp,:) = -tzzx(nsp+2,:)
-          tzzz(nsp,:) = -tzzz(nsp+2,:)
-          tzzx(nsp-1,:) = -tzzx(nsp+3,:)
-          tzzz(nsp-1,:) = -tzzz(nsp+3,:)
-       end if
+       !if(isurf == 1)then
+       !   tzzx(nsp+1,:) = 0.
+       !   tzzz(nsp+1,:) = 0.
+       !   tzzx(nsp,:) = -tzzx(nsp+2,:)
+       !   tzzz(nsp,:) = -tzzz(nsp+2,:)
+       !   tzzx(nsp-1,:) = -tzzx(nsp+3,:)
+       !   tzzz(nsp-1,:) = -tzzz(nsp+3,:)
+       !end if
        tzz(:, :) = tzzx(:, :) + tzzz(:, :)
+       if(isurf == 1)then
+          !tzzx(nsp+1,:) = 0.
+          tzz(nsp+1,:) = 0.
+          !tzzx(nsp,:) = -tzzx(nsp+2,:)
+          tzz(nsp,:) = -tzz(nsp+2,:)
+          !tzzx(nsp-1,:) = -tzzx(nsp+3,:)
+          tzz(nsp-1,:) = -tzz(nsp+3,:)
+       end if
 
        !# TXZ
        call dxforward(uz, n1e, n2e, d2)
@@ -243,15 +252,23 @@ contains
 
        txzx(:, :) = (((1./dt-pmlx1(:,:))*txzx(:, :)+(1./h)*tmod%mue(:, :)*d2(:, :))/(1./dt+pmlx1(:, :)))
        txzz(:, :) = (((1./dt-pmlz1(:,:))*txzz(:, :)+(1./h)*tmod%mue(:, :)*d1(:, :))/(1./dt+pmlz1(:, :)))
-       if(isurf == 1)then
-          txzx(nsp+1,:) = 0.
-          txzz(nsp+1,:) = 0.
-          txzx(nsp,:) = -txzx(nsp+2,:)
-          txzz(nsp,:) = -txzz(nsp+2,:)
-          txzx(nsp-1,:) = -txzx(nsp+3,:)
-          txzz(nsp-1,:) = -txzz(nsp+3,:)
-       end if
+       !if(isurf == 1)then
+       !   txzx(nsp+1,:) = 0.
+       !   txzz(nsp+1,:) = 0.
+       !   txzx(nsp,:) = -txzx(nsp+2,:)
+       !   txzz(nsp,:) = -txzz(nsp+2,:)
+       !   txzx(nsp-1,:) = -txzx(nsp+3,:)
+       !   txzz(nsp-1,:) = -txzz(nsp+3,:)
+       !end if
        txz(:, :) = txzx(:, :)+txzz(:, :)
+       if(isurf == 1)then
+          !txz(nsp+1,:) = 0.
+          !txz(nsp,:) = -txz(nsp+2,:)
+          !txz(nsp-1,:) = -txz(nsp+3,:)
+          txz(nsp+1,:) = 0.
+          txz(nsp,:) = -txz(nsp+2,:)
+          txz(nsp-1,:) = -txz(nsp+3,:)
+       end if
 
        call cpu_time(finish)
        full = full+(finish-start)
