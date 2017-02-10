@@ -1,6 +1,7 @@
 FDPSV -- TODO
 
 Todo:
+    * [URGENT] issue with output seismograms
     * validations for non-homogeneous medium
     * attenuation
     * anisotropic materials

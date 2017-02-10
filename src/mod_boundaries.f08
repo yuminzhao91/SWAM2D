@@ -52,7 +52,7 @@ contains
     pmlz0(:, :) = 0.
     pmlz1(:, :) = 0.
 
-    r = 0.001
+    r = 0.1
     vpmax = maxval(vpe)
     l = float(npml-1)*h
     d0 = apml*vpmax*log(1./r)/(2*l)
@@ -62,11 +62,13 @@ contains
        val1 = float(npml-i+1)*h-(h/2.)
        val2 = float(npml-i+1)*h+(h/2.)
        if(isurf == 1)then
+          pmlz0(i, :) = 0. !d0*(val0/l)**2
+          pmlz1(i, :) = 0. !d0*(val1/l)**2
+       else
           pmlz0(i, :) = d0*(val0/l)**2
           pmlz1(i, :) = d0*(val1/l)**2
        endif
        pmlz0(n1e+1-i,:) = d0*(val0/l)**ppml
-       !pmlz1(i, :) = d0*(val1/l)**2
        pmlz1(n1e+1-i, :) = d0*(val2/l)**ppml
        pmlx0(:, i) = d0*(val0/l)**2
        pmlx0(:, n2e+1-i) = d0*(val0/l)**ppml

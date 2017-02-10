@@ -156,18 +156,18 @@ contains
        call cpu_time(start)
        
        call dxforward(txx, n1e, n2e, d2)
-       call dzbackward(txz, n1e, n2e, d1)
+       call dzbackward(txz, n1e, n2e, nsp, d1, isurf)
        
        uxx(:, :) = (((1./dt-pmlx1(:,:))*uxx(:, :)+(1./h)*tmod%bux(:, :)*d2(:, :))/(1./dt+pmlx1(:, :)))
        uxz(:, :) = (((1./dt-pmlz0(:,:))*uxz(:, :)+(1./h)*tmod%bux(:, :)*d1(:, :))/(1./dt+pmlz0(:, :)))
        ux(:, :) = uxx(:, :)+uxz(:, :)
-       if( isurf == 1)then
-          ux(1:nsp, :) = 0.
-       endif
+       !if( isurf == 1)then
+       !   ux(1:nsp, :) = 0.
+       !endif
 
        !# UZ
        call dxbackward(txz, n1e, n2e, d2)
-       call dzforward(tzz, n1e, n2e, d1)
+       call dzforward(tzz, n1e, n2e, nsp, d1, isurf)
 
        if(srctype== 2)then
           uzx(:, :) = (((1./dt-pmlx0(:,:))*uzx(:, :)+(1./h)*tmod%buz(:, :)*d2(:, :))/(1./dt+pmlx0(:, :))) &
@@ -180,9 +180,9 @@ contains
 
        uz(:, :) = uzx(:, :)+uzz(:, :)
 
-       if( isurf == 1)then
-          uz(1:nsp, :) = 0.
-       endif
+       !if( isurf == 1)then
+       !   uz(1:nsp, :) = 0.
+       !endif
        
        call dirichlet( n1e, n2e, uxx, uxz, uzx, uzz)
        ! implement Dirichlet boundary conditions on the four edges of the grid
@@ -196,7 +196,7 @@ contains
 
        !# TXX -- TZZ
        call dxbackward(ux, n1e, n2e, d2)
-       call dzbackward(uz, n1e, n2e, d1)
+       call dzbackward(uz, n1e, n2e, nsp, d1, isurf)
 
        if(srctype == 1)then
           txxx(:, :) = (((1./dt-pmlx0(:,:))*txxx(:, :)+(1./h)*tmod%lbmu(:, :)*d2(:, :)&
@@ -223,12 +223,12 @@ contains
        if(isurf == 1)then
           tzz(nsp+1,:) = 0.
           tzz(nsp,:) = -tzz(nsp+2,:)
-          tzz(nsp-1,:) = -tzz(nsp+3,:)
+          !tzz(nsp-1,:) = -tzz(nsp+3,:)
        end if
 
        !# TXZ
        call dxforward(uz, n1e, n2e, d2)
-       call dzforward(ux, n1e, n2e, d1)
+       call dzforward(ux, n1e, n2e, nsp, d1, isurf)
 
        txzx(:, :) = (((1./dt-pmlx1(:,:))*txzx(:, :)+(1./h)*tmod%mue(:, :)*d2(:, :))/(1./dt+pmlx1(:, :)))
        txzz(:, :) = (((1./dt-pmlz1(:,:))*txzz(:, :)+(1./h)*tmod%mue(:, :)*d1(:, :))/(1./dt+pmlz1(:, :)))
@@ -303,19 +303,22 @@ contains
           itsnap = itsnap+1
        endif
 
-       if(its == ets .or. it == 1)then
-          its = 1
-          do irec=1,nrec
-             ix = recpos(irec, 1)
-             iz = recpos(irec, 2) 
-             recx(itt, irec) = (ux(iz, ix)+ux(iz,ix-1))/2.
-             recz(itt, irec) = (uz(iz, ix)+uz(iz-1,ix))/2.
-             recp(itt, irec) = press(iz, ix)
-          end do
-          itt = itt + 1
-       else
-          its = its + 1
-       end if
+       write(*, * ) 'seismograms'
+       !if(its == ets .or. it == 1)then
+       !   its = 1
+       !   do irec=1,nrec
+       !      ix = recpos(irec, 1)
+       !      iz = recpos(irec, 2) 
+       !      recx(itt, irec) = (ux(iz, ix)+ux(iz,ix-1))/2.
+       !      recz(itt, irec) = (uz(iz, ix)+uz(iz-1,ix))/2.
+       !      recp(itt, irec) = press(iz, ix)
+       !   end do
+       !   itt = itt + 1
+       !else
+       !   its = its + 1
+       !end if
+
+       write(*, * ) 'end seismo'
 
     end do
 
