@@ -303,22 +303,22 @@ contains
           itsnap = itsnap+1
        endif
 
-       write(*, * ) 'seismograms'
-       !if(its == ets .or. it == 1)then
-       !   its = 1
-       !   do irec=1,nrec
-       !      ix = recpos(irec, 1)
-       !      iz = recpos(irec, 2) 
-       !      recx(itt, irec) = (ux(iz, ix)+ux(iz,ix-1))/2.
-       !      recz(itt, irec) = (uz(iz, ix)+uz(iz-1,ix))/2.
-       !      recp(itt, irec) = press(iz, ix)
-       !   end do
-       !   itt = itt + 1
-       !else
-       !   its = its + 1
-       !end if
+       !write(*, * ) 'seismograms'
+       if(its == ets .or. it == 1)then
+          its = 1
+          do irec=1,nrec
+             ix = recpos(irec, 1)
+             iz = recpos(irec, 2)
+             recx(itt, irec) = (ux(iz, ix)+ux(iz,ix-1))/2.
+             recz(itt, irec) = (uz(iz, ix)+uz(iz-1,ix))/2.
+             recp(itt, irec) = press(iz, ix)
+          end do
+          itt = itt + 1
+       else
+          its = its + 1
+       end if
 
-       write(*, * ) 'end seismo'
+       !write(*, * ) 'end seismo'
 
     end do
 
