@@ -78,7 +78,7 @@ contains
     do it=1,nt
        t = float(it-1)*dt-t0
        sigma = (pi*f0*(t))*(pi*f0*(t)) 
-       tsrc(it) = -1.*(1.-2.*sigma)*exp(-1.*sigma)
+       tsrc(it) = (1.-2.*sigma)*exp(-1.*sigma)
     end do
 
     open(11, file='fricker.bin', access='direct', recl=nt*4)
@@ -97,7 +97,7 @@ contains
 
     betasum = 0.
 
-    if( sigma .lt. 0.)then
+    if( sigma .le. 0.)then
        gsrc(is1, is2) = 1.
     else
     xs = float(is2-1)*h

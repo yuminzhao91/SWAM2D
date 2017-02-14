@@ -161,9 +161,9 @@ contains
        uxx(:, :) = (((1./dt-pmlx1(:,:))*uxx(:, :)+(1./h)*tmod%bux(:, :)*d2(:, :))/(1./dt+pmlx1(:, :)))
        uxz(:, :) = (((1./dt-pmlz0(:,:))*uxz(:, :)+(1./h)*tmod%bux(:, :)*d1(:, :))/(1./dt+pmlz0(:, :)))
        ux(:, :) = uxx(:, :)+uxz(:, :)
-       !if( isurf == 1)then
-       !   ux(1:nsp, :) = 0.
-       !endif
+       if( isurf == 1)then
+          ux(1:nsp-2, :) = 0.
+       endif
 
        !# UZ
        call dxbackward(txz, n1e, n2e, d2)
@@ -180,9 +180,9 @@ contains
 
        uz(:, :) = uzx(:, :)+uzz(:, :)
 
-       !if( isurf == 1)then
-       !   uz(1:nsp, :) = 0.
-       !endif
+       if( isurf == 1)then
+          uz(1:nsp, :) = 0.
+       endif
        
        call dirichlet( n1e, n2e, uxx, uxz, uzx, uzz)
        ! implement Dirichlet boundary conditions on the four edges of the grid
@@ -208,7 +208,7 @@ contains
 
        txx(:, :) = txxx(:, :) + txxz(:, :)
        if(isurf == 1)then
-          txx(nsp+1, :) = txxx(nsp+1,:)-dt*tmod%lb0(nsp+1,:)/tmod%lbmu(nsp+1,:)*d2(nsp+1,:) 
+          txx(nsp+1, :) = txxx(nsp+1,:)!-dt*tmod%lb0(nsp+1,:)/tmod%lbmu(nsp+1,:)*d2(nsp+1,:) 
        end if
        
        if(srctype == 0 .or. srctype == 1)then
