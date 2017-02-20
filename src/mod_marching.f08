@@ -162,7 +162,7 @@ contains
        uxz(:, :) = (((1./dt-pmlz0(:,:))*uxz(:, :)+(1./h)*tmod%bux(:, :)*d1(:, :))/(1./dt+pmlz0(:, :)))
        ux(:, :) = uxx(:, :)+uxz(:, :)
        if( isurf == 1)then
-          ux(1:nsp-2, :) = 0.
+          ux(1:nsp-1, :) = 0.
        endif
 
        !# UZ
@@ -181,7 +181,7 @@ contains
        uz(:, :) = uzx(:, :)+uzz(:, :)
 
        if( isurf == 1)then
-          uz(1:nsp, :) = 0.
+          uz(1:nsp-1, :) = 0.
        endif
        
        call dirichlet( n1e, n2e, uxx, uxz, uzx, uzz)
@@ -204,11 +204,15 @@ contains
        else
           txxx(:, :) = (((1./dt-pmlx0(:,:))*txxx(:, :)+(1./h)*tmod%lbmu(:, :)*d2(:, :))/(1./dt+pmlx0(:, :)))
        end if
+       
        txxz(:, :) = (((1./dt-pmlz0(:,:))*txxz(:, :)+(1./h)*tmod%lb0(:, :)*d1(:, :))/(1./dt+pmlz0(:, :)))
 
        txx(:, :) = txxx(:, :) + txxz(:, :)
        if(isurf == 1)then
-          txx(nsp+1, :) = txxx(nsp+1,:)!-dt*tmod%lb0(nsp+1,:)/tmod%lbmu(nsp+1,:)*d2(nsp+1,:) 
+          txxz(nsp+1,:) = (((1./dt-pmlz0(nsp+1,:)) &
+               *txxz(nsp+1, :)+(1./h)*tmod%lb0(nsp+1,:) &
+               /tmod%lbmu(nsp+1,:)*d2(nsp+1,:))/(1./dt+pmlz0(nsp+1, :)))
+          txx(nsp+1, :) = txxx(nsp+1,:)+txxz(nsp+1,:)!-dt*tmod%lb0(nsp+1,:)/tmod%lbmu(nsp+1,:)*d2(nsp+1,:) 
        end if
        
        if(srctype == 0 .or. srctype == 1)then
@@ -236,8 +240,8 @@ contains
        txz(:, :) = txzx(:, :)+txzz(:, :)
        if(isurf == 1)then
           txz(nsp+1,:) = 0.
-          txz(nsp,:) = -txz(nsp+2,:)
-          txz(nsp-1,:) = -txz(nsp+3,:)
+          txz(nsp,:) = -txz(nsp+1,:)
+          txz(nsp-1,:) = -txz(nsp+2,:)
        end if
 
        call cpu_time(finish)

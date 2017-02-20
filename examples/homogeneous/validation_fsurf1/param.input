@@ -7,12 +7,12 @@ fvp.bin fvs.bin fro.bin
 #[boundaries]
 1 40 5. 2
 #[source]
-1 2 -1
+1 1 -1
 30. 0.05
-5.0 50. 
+25.0 25. 
 #[receiver]
 acquisition.dat
 0.00025
 #[snapshot]
 1
-0.1
+0.001

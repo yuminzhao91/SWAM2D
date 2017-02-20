@@ -4,7 +4,7 @@
  C  DELAY        FP           ZS
     5E-02        30.0         25.
  C  XREC      ZREC     DXR     DZR      NREC
-    25.0     10.0     25.0   0.0      4                        
+    25.0     0.5     25.0   0.0      4                        
  C  CP           CS
     400.     250.
  C  ITRACE(1)    ITRACE(2)    ITRACE(3)
