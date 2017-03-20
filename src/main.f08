@@ -102,7 +102,7 @@ program main
 
   !# >> Calculate PMLs
   call pmlmod(tmod%vpe, n1e, n2e, h, npml, apml, ppml, &
-       pmlx0, pmlx1, pmlz0, pmlz1)
+       pmlx0, pmlx1, pmlz0, pmlz1, isurf)
   
   !# >> Deallocate model matrices
   deallocate(tmod%vp, tmod%vs, tmod%ro)
@@ -113,9 +113,7 @@ program main
   call ricker(nt, dt, f0, t0, tsrc)
 
   !# srcspread strongly affect results remove and replace with single point gsrc
-  !call srcspread(n1e, n2e, npml, is1, is2, h, gsrc, sigma)
-  gsrc(:, :) = 0.
-  gsrc(is1, is2) = 1.
+  call srcspread(n1e, n2e, npml, is1, is2, h, gsrc, sigma)
 
   write(*, * ) 'EVOLUTION'
   call evolution(n1e, n2e, npml, h, dt, nt, nts, ntsnap, nrec, srctype, tsrc, &

@@ -109,24 +109,26 @@
 
 \begin{equation}
   \label{eq:motion}
-  \rho(x) \frac{\partial^{2}u_{i}}{\partial t^{2}} = \frac{\partial \tau_{ik}}{\partial x_{k}} + \rho(x)f_{i} ,
+  \rho(x) \frac{\partial^{2}u_{i}}{\partial t^{2}} = \frac{\partial \sigma_{ik}}{\partial x_{k}} + \rho(x)f_{i} ,
 \end{equation}
 
-\noindent where $x=(x,y,z)$ is the position vector, $u$ is the displacement, $\tau_{ij}$ is the stress tensor, $\rho(x)$ is the density and $f=(f_{x}, f_{y}, f_{z})$ is the a volumetric force.\\
+\noindent where $x=(x,y,z)$ is the position vector, $u$ is the displacement, $\sigma_{ij}$ is the stress tensor, $\rho(x)$ is the density and $f=(f_{x}, f_{y}, f_{z})$ is the a volumetric force.\\
 
-\noindent The stress tensor $\tau$, which allows to describe the elastic medium, is lineary relied to the strain tensor $\epsilon$ through the fourth-rank elastic tensor $C_{ijkl}$. This linear relation, called generalized Hooke's law,  is defined as follow:
+\noindent The stress tensor $\sigma$, which allows to describe the elastic medium, is lineary relied to the strain tensor $\epsilon$ through the fourth-rank elastic tensor $C_{ijkl}$. This linear relation, called generalized Hooke's law,  is defined as follow:
 
 \begin{equation}
   \label{eq:hooke}
-  \tau_{ij} = C_{ijkl}\epsilon_{kl}\ ,
+  \sigma_{ij} = C_{ijkl}\epsilon_{kl}\ ,
 \end{equation} 
 
 \noindent where
 
 \begin{equation}
   \label{eq:elastic-tensor}
-  C_{ijkl} = \lambda \delta_{ij} \delta_{kl} + \mu (\delta_{ik}\delta_{jl}+\delta_{il}\delta_{jk})\ .
+  C_{ijkl} = \lambda \delta_{ij} \delta_{kl} + \mu (\delta_{ik}\delta_{jl}+\delta_{il}\delta_{jk})\ ,
 \end{equation}
+
+\noindent where $\delta$ is the Kronehker symbol and $\lambda$ and $\mu$ are the Lam\'e parameters.\\
 
 \noindent The strain tensor corresponds to the symetric part of the displacement derivatives with respect to space, \textit{i.e.} to the deformation of the elastic body such as:
 
@@ -135,28 +137,34 @@
   \epsilon_{ij} = \frac{1}{2} \left( \frac{\partial u_{j}}{\partial x_{i}} + \frac{\partial u_{i}}{\partial x_{j}} \right)\ .
 \end{equation}
 
-\noindent Second order hyperbolic system, called displacement-stress formulation:
+\noindent Combining equations \ref{eq:hooke}, \ref{eq:elastic-tensor} and \ref{eq:strain-tensor}, and injecting the result in equation \ref{eq:motion} leads to the second order hyperbolic system, called displacement-stress formulation. In 2D, where all derivative with respect to $y$ vanishes, the displacement-stress formulation is:
 
 \index{displacement-stress formulation}
 \begin{eqnarray}
   \label{eq:displacement-stress}
-  \frac{\partial ^{2} u_{x}}{\partial t^{2}} = \rho^{{\scriptscriptstyle-1}} \left( \frac{\partial \tau_{xx}}{\partial x} + \frac{\partial \tau_{xz}}{\partial z} \right) \nonumber \\
-  \frac{\partial ^{2} u_{z}}{\partial t^{2}} = \rho^{{\scriptscriptstyle -1}} \left( \frac{\partial \tau_{xz}}{\partial x} + \frac{\partial \tau_{zz}}{\partial z} \right) \nonumber \\
-  \tau_{xx} = (\lambda+2\mu)\frac{\partial u_{x}}{\partial x} + \lambda \frac{\partial u_{z}}{\partial z} \\
-  \tau_{zz}= (\lambda+2\mu)\frac{\partial u_{z}}{\partial z} + \lambda \frac{\partial u_{x}}{\partial x} \nonumber \\
-  \tau_{xz} = \mu \left( \frac{\partial u_{x}}{\partial z} + \frac{\partial u_{z}}{\partial x } \right) \nonumber
+  \frac{\partial ^{2} u_{x}}{\partial t^{2}} = \rho^{{\scriptscriptstyle-1}} \left( \frac{\partial \sigma_{xx}}{\partial x} + \frac{\partial \sigma_{xz}}{\partial z} \right)\ , \nonumber \\
+  \frac{\partial ^{2} u_{z}}{\partial t^{2}} = \rho^{{\scriptscriptstyle -1}} \left( \frac{\partial \sigma_{xz}}{\partial x} + \frac{\partial \sigma_{zz}}{\partial z} \right)\ ,
+\end{eqnarray}
+
+\noindent where:
+
+\begin{eqnarray}
+  \label{eq:displacement-stress-2}
+  \sigma_{xx} = (\lambda+2\mu)\frac{\partial u_{x}}{\partial x} + \lambda \frac{\partial u_{z}}{\partial z}\ , \nonumber \\
+  \sigma_{zz}= (\lambda+2\mu)\frac{\partial u_{z}}{\partial z} + \lambda \frac{\partial u_{x}}{\partial x}\ , \\
+  \sigma_{xz} = \mu \left( \frac{\partial u_{x}}{\partial z} + \frac{\partial u_{z}}{\partial x } \right)\ . \nonumber
 \end{eqnarray}\\
 
-\noindent First-order hyperbolic system, called velocity-stress formulation:
+\noindent This system can be expressed in term of velocity instead of displacement which leads to the first-order hyperbolic system, called velocity-stress formulation:
 
 \index{velocity-stress formulation}
 \begin{eqnarray}
   \label{eq:velocity-stress}
-  \frac{\partial v_{x}}{\partial t} = \rho^{{\scriptscriptstyle-1}} \left( \frac{\partial \tau_{xx}}{\partial x} + \frac{\partial \tau_{xz}}{\partial z} \right) \nonumber \\
-  \frac{\partial v_{z}}{\partial t} = \rho^{{\scriptscriptstyle -1}} \left( \frac{\partial \tau_{xz}}{\partial x} + \frac{\partial \tau_{zz}}{\partial z} \right) \nonumber \\
-  \frac{\partial \tau_{xx}}{\partial t} = (\lambda+2\mu)\frac{\partial v_{x}}{\partial x} + \lambda \frac{\partial v_{z}}{\partial z} \\
-  \frac{\partial \tau_{zz}}{\partial t} = (\lambda+2\mu)\frac{\partial v_{z}}{\partial z} + \lambda \frac{\partial v_{x}}{\partial x} \nonumber \\
-  \frac{\partial \tau_{xz}}{\partial t} = \mu \left( \frac{\partial v_{x}}{\partial z} + \frac{\partial v_{z}}{\partial x } \right) \nonumber
+  \frac{\partial v_{x}}{\partial t} = \rho^{{\scriptscriptstyle-1}} \left( \frac{\partial \sigma_{xx}}{\partial x} + \frac{\partial \sigma_{xz}}{\partial z} \right) \nonumber \\
+  \frac{\partial v_{z}}{\partial t} = \rho^{{\scriptscriptstyle -1}} \left( \frac{\partial \sigma_{xz}}{\partial x} + \frac{\partial \sigma_{zz}}{\partial z} \right) \nonumber \\
+  \frac{\partial \sigma_{xx}}{\partial t} = (\lambda+2\mu)\frac{\partial v_{x}}{\partial x} + \lambda \frac{\partial v_{z}}{\partial z} \\
+  \frac{\partial \sigma_{zz}}{\partial t} = (\lambda+2\mu)\frac{\partial v_{z}}{\partial z} + \lambda \frac{\partial v_{x}}{\partial x} \nonumber \\
+  \frac{\partial \sigma_{xz}}{\partial t} = \mu \left( \frac{\partial v_{x}}{\partial z} + \frac{\partial v_{z}}{\partial x } \right) \nonumber
 \end{eqnarray}
 
 \section{Staggered-grid scheme}
@@ -173,15 +181,20 @@
 
 \section{Discretization}
 
-\noindent Second order forward ($D^{+}$) and backward ($D^{-}$) operators:
+\noindent Given the use of the staggered-grid scheme to discretize the space, forward and backward finite-difference operators are use to solve the velocity-stress equations.\\
+
+%\noindent Second order forward ($D^{+}$) and backward ($D^{-}$) operators:
+%\index{forward operator}
+%\index{backward operator}
+%\begin{eqnarray}
+%  D^{+}=f(i+1)-f(i) \nonumber \\
+%  D^{-}=f(i)-f(i-1)
+%\end{eqnarray}
+
+\noindent The fourth-order forward ($D^{+}$) and backward ($D^{-}$) operators are widely used and are defined, in 1D, as:
 \index{forward operator}
 \index{backward operator}
-\begin{eqnarray}
-  D^{+}=f(i+1)-f(i) \nonumber \\
-  D^{-}=f(i)-f(i-1)
-\end{eqnarray}
 
-\noindent Fourth-order forward ($D^{+}$) and backward ($D^{-}$) operators:
 \begin{eqnarray}
   D^{+}=c_{1}[f(i+1)-f(i)]+c_{2}[f(i+2)-f(i-1)] \nonumber \\
   D^{-}=c_{1}[f(i)-f(i-1)]+c_{2}[f(i+1)-f(i-2)]
@@ -196,9 +209,19 @@
   \rho_{z}(i+\frac{1}{2},j) = \frac{1}{2}(\rho (i+1,j)+\rho(i,j))
 \end{eqnarray}
 
+\clearpage\newpage
 \begin{figure}[!ht]
   \centering
   \includegraphics[scale=1.0]{fig/validation_dispersion.eps}
+  \caption{Comparison between (left) a modeling using a suitable number of grid points per wavelenght and (right) a modeling using unsufficient nomber of grid points per wavelenght.}
+  \label{fig:dispersion-validation}
+\end{figure}
+
+\begin{figure}[!ht]
+  \centering
+  \includegraphics[scale=1.0]{fig/validation_courant.eps}
+  \caption{.}
+  \label{fig:courant-validation}
 \end{figure}
 
 \section{Initial and boundary conditions}
@@ -209,27 +232,51 @@
 \index{perfectly matched layer}
 \index{absorbing boundary conditions}
 
-\cite{berenger1994perfectly}
+\noindent At the scale of seismic exploration and less, the target area (\textit{i.e.} the model), is a semi-infinite space bounded only at the top by a free surface. It is thus necessary to simulate a infinite medium at the lateral and bottom boundary. This can be achieve using the \textit{Perfectly matched layer} (PML) absorbing boundaries. PML were initially developed in the framework of electro-magentic modeling by \cite{berenger1994perfectly} and was quickly adopted in seismic modeling.\\
 
+\noindent In the time domain, PML can be defined as:
+
+\begin{eqnarray}
+\label{eq:pml-equations}
+d = d_{0} \left( \frac{q}{L_{PML}} \right) ^{n}\ , \\
+d_{0} = Ac_{p} \frac{log(1/R)}{2L_{PML}}\ ,
+\end{eqnarray}
+
+\noindent where $q$ is the distance from PML intern boundary, $L_{PML}$ is the width of the PML, $A$ is the amplitude of the PML, $c_{p}$ is the P-wave velocity and $R$ is a reflection coefficient generally low.\\
+
+\noindent Figure \ref{fig:validation-pml} demonstrate the importance of absorbing boundary conditions and the efficiency of PML. PML are parametrized following recommandations of (CITE KOMATITSCH, FESTA HERE): $A=3$ and $R=0.01$. In this example, the PML are $20\ m$ wide (40 grid points).
 \begin{figure}[!ht]
   \centering
   \includegraphics[scale=1.0]{fig/validation_pml.eps}
+  \caption{Comparison of (left column) snapshots of the pressure wavefield for a model without PML ($A=0$) and (right column) snapshots of the pressure wavefield for a model with PML ($A=3$) applied to each boundary. Black dashed line defined the limits between PML and physical model.}
+  \label{fig:validation-pml}
 \end{figure}
-
-\begin{eqnarray}
-\label{pml-damp}
-d = d_{0} \left( \frac{q}{L_{PML}} \right) ^{n} \\
-d_{0} = Ac_{p} \frac{log(1/R)}{2L_{PML}}
-\end{eqnarray}
 
 \subsection{Free surface}
 \index{free surface}
 
+\noindent As discussed in the previous subsection, the earth structures must be considered as semi-infite space due to the presence of a free surface defined by the topography. Given the strong formulation of the wave equation used by finite-difference methods, the free surface must be explicitly defined.\\
+
+\noindent Two popular methods are the vaccum approach and the image theory approach.
+
 \begin{figure}[!ht]
   \centering
   \includegraphics[scale=1.0]{fig/validation_fsurf.eps}
-  \caption{Free surface. Left: vacuum approach. Right: image theory approach.}
+  \caption{Two possible approach to implement free surface: (left) the vacuum approach and (right) the image theory approach.}
 \end{figure}
+
+\section{Sources}
+\index{sources}
+
+\subsection{Explosive source}
+\index{explosive source}
+
+\noindent Explosive source is added to normal stress $\sigma_{xx}$ and $\sigma{zz}$.
+
+\subsection{Body force source}
+\index{force source}
+
+
 
 % ----------------------------------------------------------------------
 % GETTING STARTED
@@ -269,6 +316,26 @@ d_{0} = Ac_{p} \frac{log(1/R)}{2L_{PML}}
 % NUMERICAL EXAMPLES
 % ----------------------------------------------------------------------
 \chapter{Numerical examples}
+
+\section{Weathered model}
+
+\section{Corner-edge model}
+
+\section{Advanced model}
+
+\begin{figure}[!ht]
+  \centering
+  \includegraphics[scale=1.0]{fig/perez_model.eps}
+  \caption{Diapir model. \cite{solano2014alternative}}
+  \label{fig:perez_model}
+\end{figure}
+
+\begin{figure}[!ht]
+  \centering
+  \includegraphics[scale=1.0]{fig/perez_model_profile.eps}
+  \caption{Diapir model.}
+  \label{fig:perez_model}
+\end{figure}
 
 % ----------------------------------------------------------------------
 % APPENDICES
