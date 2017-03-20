@@ -158,11 +158,13 @@ contains
        call dxforward(txx, n1e, n2e, d2)
        call dzbackward(txz, n1e, n2e, nsp, d1, isurf)
        
-       uxx(:, :) = (((1./dt-pmlx1(:,:))*uxx(:, :)+(1./h)*tmod%bux(:, :)*d2(:, :))/(1./dt+pmlx1(:, :)))
-       uxz(:, :) = (((1./dt-pmlz0(:,:))*uxz(:, :)+(1./h)*tmod%bux(:, :)*d1(:, :))/(1./dt+pmlz0(:, :)))
+       uxx(:, :) = (((1./dt-pmlx1(:,:))*uxx(:, :) &
+            +(1./h)*tmod%bux(:, :)*d2(:, :))/(1./dt+pmlx1(:, :)))
+       uxz(:, :) = (((1./dt-pmlz0(:,:))*uxz(:, :) &
+            +(1./h)*tmod%bux(:, :)*d1(:, :))/(1./dt+pmlz0(:, :)))
        ux(:, :) = uxx(:, :)+uxz(:, :)
        if( isurf == 1)then
-          ux(1:nsp-1, :) = 0.
+          ux(1:nsp, :) = 0.
        endif
 
        !# UZ
@@ -170,18 +172,21 @@ contains
        call dzforward(tzz, n1e, n2e, nsp, d1, isurf)
 
        if(srctype== 2)then
-          uzx(:, :) = (((1./dt-pmlx0(:,:))*uzx(:, :)+(1./h)*tmod%buz(:, :)*d2(:, :))/(1./dt+pmlx0(:, :))) &
+          uzx(:, :) = (((1./dt-pmlx0(:,:))*uzx(:, :) &
+               +(1./h)*tmod%buz(:, :)*d2(:, :))/(1./dt+pmlx0(:, :))) &
                +tmod%buz*(tsrc(it)*gsrc(:, :)*dt/(h*h))
        else
-          uzx(:, :) = (((1./dt-pmlx0(:,:))*uzx(:, :)+(1./h)*tmod%buz(:, :)*d2(:, :))/(1./dt+pmlx0(:, :)))
+          uzx(:, :) = (((1./dt-pmlx0(:,:))*uzx(:, :) &
+               +(1./h)*tmod%buz(:, :)*d2(:, :))/(1./dt+pmlx0(:, :)))
        end if
 
-       uzz(:, :) = (((1./dt-pmlz1(:,:))*uzz(:, :)+(1./h)*tmod%buz(:, :)*d1(:, :))/(1./dt+pmlz1(:, :)))
+       uzz(:, :) = (((1./dt-pmlz1(:,:))*uzz(:, :) &
+            +(1./h)*tmod%buz(:, :)*d1(:, :))/(1./dt+pmlz1(:, :)))
 
        uz(:, :) = uzx(:, :)+uzz(:, :)
 
        if( isurf == 1)then
-          uz(1:nsp-1, :) = 0.
+          uz(1:nsp, :) = 0.
        endif
        
        call dirichlet( n1e, n2e, uxx, uxz, uzx, uzz)
@@ -190,7 +195,8 @@ contains
        !# PRESSURE
        do i2=1,n2e-1
           do i1=2,n1e-1
-             press(i1, i2) = (-tmod%lbmu(i1, i2)/h)*(ux(i1,i2)-ux(i1,i2-1)+uz(i1,i2)-uz(i1-1,i2))
+             press(i1, i2) = (-tmod%lbmu(i1, i2)/h)*(ux(i1,i2)-ux(i1,i2-1) &
+                  +uz(i1,i2)-uz(i1-1,i2))
           enddo
        enddo
 
@@ -199,49 +205,61 @@ contains
        call dzbackward(uz, n1e, n2e, nsp, d1, isurf)
 
        if(srctype == 1)then
-          txxx(:, :) = (((1./dt-pmlx0(:,:))*txxx(:, :)+(1./h)*tmod%lbmu(:, :)*d2(:, :)&
-               )/(1./dt+pmlx0(:, :)))+(tsrc(it)*gsrc(:,:))/(h*h)*dt
+          txxx(:, :) = (((1./dt-pmlx0(:,:))*txxx(:, :) &
+               +(1./h)*tmod%lbmu(:, :)*d2(:, :))/(1./dt+pmlx0(:, :))) &
+               +(tsrc(it)*gsrc(:,:))/(h*h)*dt
        else
-          txxx(:, :) = (((1./dt-pmlx0(:,:))*txxx(:, :)+(1./h)*tmod%lbmu(:, :)*d2(:, :))/(1./dt+pmlx0(:, :)))
+          txxx(:, :) = (((1./dt-pmlx0(:,:))*txxx(:, :) &
+               +(1./h)*tmod%lbmu(:, :)*d2(:, :))/(1./dt+pmlx0(:, :)))
        end if
        
-       txxz(:, :) = (((1./dt-pmlz0(:,:))*txxz(:, :)+(1./h)*tmod%lb0(:, :)*d1(:, :))/(1./dt+pmlz0(:, :)))
+       txxz(:, :) = (((1./dt-pmlz0(:,:))*txxz(:, :) &
+            +(1./h)*tmod%lb0(:, :)*d1(:, :))/(1./dt+pmlz0(:, :)))
 
        txx(:, :) = txxx(:, :) + txxz(:, :)
        if(isurf == 1)then
           txxz(nsp+1,:) = (((1./dt-pmlz0(nsp+1,:)) &
                *txxz(nsp+1, :)+(1./h)*tmod%lb0(nsp+1,:) &
                /tmod%lbmu(nsp+1,:)*d2(nsp+1,:))/(1./dt+pmlz0(nsp+1, :)))
-          txx(nsp+1, :) = txxx(nsp+1,:)+txxz(nsp+1,:)!-dt*tmod%lb0(nsp+1,:)/tmod%lbmu(nsp+1,:)*d2(nsp+1,:) 
+          !txx(nsp+1, :) = txxx(nsp+1,:)+txxz(nsp+1,:)
+          !-dt*tmod%lb0(nsp+1,:)/tmod%lbmu(nsp+1,:)*d2(nsp+1,:)
+          txx(nsp+1, :) = txxx(nsp+1,:)-dt*tmod%lb0(nsp+1,:)/tmod%lbmu(nsp+1,:)*d2(nsp+1,:)
        end if
        
        if(srctype == 0 .or. srctype == 1)then
-          tzzx(:, :) = (((1./dt-pmlx0(:,:))*tzzx(:, :)+(1./h)*tmod%lb0(:, :)*d2(:, :)&
-               )/(1./dt+pmlx0(:, :)))+(tsrc(it)*gsrc(:,:))/(h*h)*dt
+          tzzx(:, :) = (((1./dt-pmlx0(:,:))*tzzx(:, :) &
+               +(1./h)*tmod%lb0(:, :)*d2(:, :))/(1./dt+pmlx0(:, :))) &
+               +(tsrc(it)*gsrc(:,:))/(h*h)*dt
        else
-          tzzx(:, :) = (((1./dt-pmlx0(:,:))*tzzx(:, :)+(1./h)*tmod%lb0(:, :)*d2(:, :))/(1./dt+pmlx0(:, :)))
+          tzzx(:, :) = (((1./dt-pmlx0(:,:))*tzzx(:, :) &
+               +(1./h)*tmod%lb0(:, :)*d2(:, :))/(1./dt+pmlx0(:, :)))
        end if
-       tzzz(:, :) = (((1./dt-pmlz0(:,:))*tzzz(:, :)+(1./h)*tmod%lbmu(:, :)*d1(:, :))/(1./dt+pmlz0(:, :)))
+       tzzz(:, :) = (((1./dt-pmlz0(:,:))*tzzz(:, :) &
+            +(1./h)*tmod%lbmu(:, :)*d1(:, :))/(1./dt+pmlz0(:, :)))
        
        tzz(:, :) = tzzx(:, :) + tzzz(:, :)
        if(isurf == 1)then
           tzz(nsp+1,:) = 0.
           tzz(nsp,:) = -tzz(nsp+2,:)
-          !tzz(nsp-1,:) = -tzz(nsp+3,:)
        end if
 
        !# TXZ
        call dxforward(uz, n1e, n2e, d2)
        call dzforward(ux, n1e, n2e, nsp, d1, isurf)
 
-       txzx(:, :) = (((1./dt-pmlx1(:,:))*txzx(:, :)+(1./h)*tmod%mue(:, :)*d2(:, :))/(1./dt+pmlx1(:, :)))
-       txzz(:, :) = (((1./dt-pmlz1(:,:))*txzz(:, :)+(1./h)*tmod%mue(:, :)*d1(:, :))/(1./dt+pmlz1(:, :)))
+       txzx(:, :) = (((1./dt-pmlx1(:,:))*txzx(:, :) &
+            +(1./h)*tmod%mue(:, :)*d2(:, :))/(1./dt+pmlx1(:, :)))
+       txzz(:, :) = (((1./dt-pmlz1(:,:))*txzz(:, :) &
+            +(1./h)*tmod%mue(:, :)*d1(:, :))/(1./dt+pmlz1(:, :)))
        
        txz(:, :) = txzx(:, :)+txzz(:, :)
        if(isurf == 1)then
-          txz(nsp+1,:) = 0.
-          txz(nsp,:) = -txz(nsp+1,:)
-          txz(nsp-1,:) = -txz(nsp+2,:)
+          !txz(nsp+1,:) = 0.
+          !txz(nsp,:) = -txz(nsp+2,:) !+1
+          !txz(nsp-1,:) = -txz(nsp+3,:) !+2
+          txz(nsp,:) = 0.
+          txz(nsp-1,:) = -txz(nsp+1,:) !+1
+          txz(nsp-2,:) = -txz(nsp+2,:) !+2
        end if
 
        call cpu_time(finish)
