@@ -128,7 +128,7 @@ contains
     mu0(:, :) = vse(:, :)*vse(:, :)*roe(:, :)
   
     do i2=1,n2e-1
-       do i1=1, n2e-1
+       do i1=1, n1e-1
           mue(i1, i2) = (1./4.)*(mu0(i1,i2)+mu0(i1+1,i2)+mu0(i1,i2+1)+mu0(i1+1,i2+1))
        end do
     end do

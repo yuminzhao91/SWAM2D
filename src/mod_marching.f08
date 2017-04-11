@@ -95,7 +95,10 @@ contains
 
     character(len=80) :: snapfile
 
-
+    ! >> TMP
+    real, allocatable :: tmp(:, : )
+    real, allocatable :: uxe(:, : ), uze(:, :)
+    
     ! >> ADDING PML TEMP. IN MARCHING MOD
     real, dimension(n1e, n2e) :: pmlx0, pmlx1, pmlz0, pmlz1
 
@@ -124,6 +127,10 @@ contains
     ! >> Allocate pressure field
     allocate(press(n1e, n2e))
 
+    ! >> TEMP
+    allocate(tmp(n1e, n2e))
+    allocate(uxe(n1e, n2e), uze(n1e, n2e))
+    
     ! >> Initialize velocity fields (including splitted)
     ux(:, :) = 0.
     uz(:, :) = 0.
@@ -132,6 +139,9 @@ contains
     uzx(:, :) = 0.
     uzz(:, : ) = 0.
 
+    uxe(:, :) = 0.
+    uze(:, :) = 0.
+    
     ! >> Initialize stress fields (including splitted)
     txx(:, :) = 0.
     tzz(:, :) = 0.
@@ -157,20 +167,16 @@ contains
        
        call dxforward(txx, n1e, n2e, d2)
        call dzbackward(txz, n1e, n2e, nsp, d1, isurf)
-       
+
        uxx(:, :) = (((1./dt-pmlx1(:,:))*uxx(:, :) &
             +(1./h)*tmod%bux(:, :)*d2(:, :))/(1./dt+pmlx1(:, :)))
        uxz(:, :) = (((1./dt-pmlz0(:,:))*uxz(:, :) &
             +(1./h)*tmod%bux(:, :)*d1(:, :))/(1./dt+pmlz0(:, :)))
-       ux(:, :) = uxx(:, :)+uxz(:, :)
-       if( isurf == 1)then
-          ux(1:nsp, :) = 0.
-       endif
 
        !# UZ
        call dxbackward(txz, n1e, n2e, d2)
        call dzforward(tzz, n1e, n2e, nsp, d1, isurf)
-
+       
        if(srctype== 2)then
           uzx(:, :) = (((1./dt-pmlx0(:,:))*uzx(:, :) &
                +(1./h)*tmod%buz(:, :)*d2(:, :))/(1./dt+pmlx0(:, :))) &
@@ -183,15 +189,13 @@ contains
        uzz(:, :) = (((1./dt-pmlz1(:,:))*uzz(:, :) &
             +(1./h)*tmod%buz(:, :)*d1(:, :))/(1./dt+pmlz1(:, :)))
 
-       uz(:, :) = uzx(:, :)+uzz(:, :)
-
-       if( isurf == 1)then
-          uz(1:nsp, :) = 0.
-       endif
        
        call dirichlet( n1e, n2e, uxx, uxz, uzx, uzz)
        ! implement Dirichlet boundary conditions on the four edges of the grid
-       
+
+       ux(:, : ) = uxx(:, :)+uxz(:, :)
+       uz(:, : ) = uzx(:, :)+uzz(:, :)
+
        !# PRESSURE
        do i2=1,n2e-1
           do i1=2,n1e-1
@@ -201,6 +205,13 @@ contains
        enddo
 
        !# TXX -- TZZ
+       if(isurf == 1)then
+          do i2=2,n2e
+             uz(nsp, i2) = uz(nsp+1, i2)+&
+                  tmod%lb0(nsp+1, i2)/tmod%lbmu(nsp+1,i2)*&
+                  (ux(nsp+1,i2)-ux(nsp+1,i2-1))
+          enddo
+       endif
        call dxbackward(ux, n1e, n2e, d2)
        call dzbackward(uz, n1e, n2e, nsp, d1, isurf)
 
@@ -212,19 +223,20 @@ contains
           txxx(:, :) = (((1./dt-pmlx0(:,:))*txxx(:, :) &
                +(1./h)*tmod%lbmu(:, :)*d2(:, :))/(1./dt+pmlx0(:, :)))
        end if
-       
-       txxz(:, :) = (((1./dt-pmlz0(:,:))*txxz(:, :) &
-            +(1./h)*tmod%lb0(:, :)*d1(:, :))/(1./dt+pmlz0(:, :)))
 
+       if( isurf == 1 )then
+          tmp(:, :) = txxz(:, :)
+          txxz(:, :) = (((1./dt-pmlz0(:,:))*txxz(:, :) &
+               +(1./h)*tmod%lb0(:, :)*d1(:, :))/(1./dt+pmlz0(:, :)))
+          txxz(nsp+1 ,:) = (((1./dt-pmlx0(nsp+1,:))*tmp(nsp+1, :) &
+               -(1./h)*tmod%lb0(nsp+1, :)*tmod%lb0(nsp+1, :)/tmod%lbmu(nsp+1,:)&
+               *(uz(nsp+1,:)-uz(nsp,:)))/(1./dt+pmlx0(nsp+1, :)))
+       else
+          txxz(:, :) = (((1./dt-pmlz0(:,:))*txxz(:, :) &
+               +(1./h)*tmod%lb0(:, :)*d1(:, :))/(1./dt+pmlz0(:, :)))
+       endif
+       
        txx(:, :) = txxx(:, :) + txxz(:, :)
-       if(isurf == 1)then
-          txxz(nsp+1,:) = (((1./dt-pmlz0(nsp+1,:)) &
-               *txxz(nsp+1, :)+(1./h)*tmod%lb0(nsp+1,:) &
-               /tmod%lbmu(nsp+1,:)*d2(nsp+1,:))/(1./dt+pmlz0(nsp+1, :)))
-          !txx(nsp+1, :) = txxx(nsp+1,:)+txxz(nsp+1,:)
-          !-dt*tmod%lb0(nsp+1,:)/tmod%lbmu(nsp+1,:)*d2(nsp+1,:)
-          txx(nsp+1, :) = txxx(nsp+1,:)-dt*tmod%lb0(nsp+1,:)/tmod%lbmu(nsp+1,:)*d2(nsp+1,:)
-       end if
        
        if(srctype == 0 .or. srctype == 1)then
           tzzx(:, :) = (((1./dt-pmlx0(:,:))*tzzx(:, :) &
@@ -254,12 +266,8 @@ contains
        
        txz(:, :) = txzx(:, :)+txzz(:, :)
        if(isurf == 1)then
-          !txz(nsp+1,:) = 0.
-          !txz(nsp,:) = -txz(nsp+2,:) !+1
-          !txz(nsp-1,:) = -txz(nsp+3,:) !+2
-          txz(nsp,:) = 0.
-          txz(nsp-1,:) = -txz(nsp+1,:) !+1
-          txz(nsp-2,:) = -txz(nsp+2,:) !+2
+          txz(nsp,:) = -txz(nsp+1,:)
+          txz(nsp-1,:) = -txz(nsp+2,:)
        end if
 
        call cpu_time(finish)
@@ -325,14 +333,27 @@ contains
           itsnap = itsnap+1
        endif
 
+       !interpolate
+       do i2=1,n2e-1
+          do i1=1,n1e
+             uxe(i1,i2) = ux(i1,i2) !0.5*(ux(i1+1,i2)+ux(i1,i2))
+          enddo
+       enddo
+       
+       do i2=1,n2e
+          do i1=1,n1e-1
+             uze(i1,i2) = uz(i1,i2) !0.5*(uz(i1,i2)+uz(i1,i2))
+          enddo
+       enddo
+       
        !write(*, * ) 'seismograms'
        if(its == ets .or. it == 1)then
           its = 1
           do irec=1,nrec
              ix = recpos(irec, 1)
              iz = recpos(irec, 2)
-             recx(itt, irec) = (ux(iz, ix)+ux(iz,ix-1))/2.
-             recz(itt, irec) = (uz(iz, ix)+uz(iz-1,ix))/2.
+             recx(itt, irec) = ux(iz,ix) !(ux(iz, ix)+ux(iz,ix-1))/2.
+             recz(itt, irec) = uz(iz,ix) !(uz(iz+1, ix)+uz(iz,ix))/2.
              recp(itt, irec) = press(iz, ix)
           end do
           itt = itt + 1
@@ -361,6 +382,8 @@ contains
     ! >> Free pressure field
     deallocate(press)
 
+    deallocate(uxe, uze)
+    
   end subroutine evolution
 
 end module marching

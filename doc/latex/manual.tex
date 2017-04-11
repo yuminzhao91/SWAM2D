@@ -1,7 +1,7 @@
 \documentclass{gnulike}
 
 \usepackage{natbib}
-\usepackage{graphics}
+\usepackage{graphicx} %graphics}
 \usepackage{chngcntr}
 \usepackage{sectsty}
 \usepackage{rotating}
@@ -212,15 +212,15 @@
 \clearpage\newpage
 \begin{figure}[!ht]
   \centering
-  \includegraphics[scale=1.0]{fig/validation_dispersion.eps}
-  \caption{Comparison between (left) a modeling using a suitable number of grid points per wavelenght and (right) a modeling using unsufficient nomber of grid points per wavelenght.}
+  \includegraphics[width=0.9\columnwidth]{fig/validation_snap_dispersion.eps}
+  \caption{Grid dispersion. Snapshots of the pressure wavefield for an infinite homogeneous model and a too large spacial grid point distance. Black dashed line defined the limits between PML and physical model.}
   \label{fig:dispersion-validation}
 \end{figure}
 
 \begin{figure}[!ht]
   \centering
-  \includegraphics[scale=1.0]{fig/validation_courant.eps}
-  \caption{.}
+  \includegraphics[width=0.9\columnwidth]{fig/validation_courant.eps}
+  \caption{\textit{Courant} instability. Snapshots of the pressure wavefield for an infinite homogeneous model and a too large \textit{Courant} number. Black dashed line defined the limits between PML and physical model.}
   \label{fig:courant-validation}
 \end{figure}
 
@@ -244,25 +244,54 @@ d_{0} = Ac_{p} \frac{log(1/R)}{2L_{PML}}\ ,
 
 \noindent where $q$ is the distance from PML intern boundary, $L_{PML}$ is the width of the PML, $A$ is the amplitude of the PML, $c_{p}$ is the P-wave velocity and $R$ is a reflection coefficient generally low.\\
 
-\noindent Figure \ref{fig:validation-pml} demonstrate the importance of absorbing boundary conditions and the efficiency of PML. PML are parametrized following recommandations of (CITE KOMATITSCH, FESTA HERE): $A=3$ and $R=0.01$. In this example, the PML are $20\ m$ wide (40 grid points).
+\noindent Figure \ref{fig:validation-pml} demonstrate the importance of absorbing boundary conditions and the efficiency of PML. PML are parametrized following recommandations of \cite{festa2005newmark}: $A=3$ and $R=0.01$. In this example, the PML are $20\ m$ wide (40 grid points).
+
 \begin{figure}[!ht]
   \centering
-  \includegraphics[scale=1.0]{fig/validation_pml.eps}
-  \caption{Comparison of (left column) snapshots of the pressure wavefield for a model without PML ($A=0$) and (right column) snapshots of the pressure wavefield for a model with PML ($A=3$) applied to each boundary. Black dashed line defined the limits between PML and physical model.}
+  \includegraphics[width=0.9\columnwidth]{fig/validation_snap_pml.eps}
+  \caption{Snapshots of the pressure wavefield for an infinite (PMLs all around the model) homogeneous model. Black dashed line defined the limits between PML and physical model.}
   \label{fig:validation-pml}
+\end{figure}
+
+\begin{figure}[!ht]
+  \centering
+  \includegraphics[width=0.9\columnwidth]{fig/validation_trac_pml.eps}
+  \caption{Comparison between analytical solution (gray line) and finite-difference modeling solution (black line) for an infinite homogeneous medium.}
+  \label{fig:validation_trac_pml}
 \end{figure}
 
 \subsection{Free surface}
 \index{free surface}
 
-\noindent As discussed in the previous subsection, the earth structures must be considered as semi-infite space due to the presence of a free surface defined by the topography. Given the strong formulation of the wave equation used by finite-difference methods, the free surface must be explicitly defined.\\
+\noindent As discussed in the previous subsection, the earth structures must be considered as semi-infinite space due to the presence of a free surface defined by the topography. Given the strong formulation of the wave equation used by finite-difference methods, the free surface must be explicitly defined.\\
 
-\noindent Two popular methods are the vaccum approach and the image theory approach.
+\noindent The image theory method is a way to apprximate the free surface and was firstly proposed by \cite{levander1988fourth}.
 
 \begin{figure}[!ht]
   \centering
-  \includegraphics[scale=1.0]{fig/validation_fsurf.eps}
-  \caption{Two possible approach to implement free surface: (left) the vacuum approach and (right) the image theory approach.}
+  \includegraphics[width=0.9\columnwidth]{fig/validation_snap_fsurf.eps}
+  \caption{Snapshots of the pressure wavefield for a semi-infinite (free surface) homogeneous model. Black dashed line define the limits between PML and physical model, red line defines the free surface.}
+\end{figure}
+
+\noindent At free surface boundary condition $z=0$, all normal stresses vanish:
+
+\begin{eqnarray}
+  \sigma_{zz} = \lambda \frac{\partial u_{x}}{\partial x}+(\lambda+2\mu)\frac{\partial u_{z}}{\partial z} =0 \nonumber \\
+  \sigma_{xz} = \mu \left( \frac{\partial u_{z}}{\partial x} + \frac{\partial u_{x}}{\partial z} \right) = 0
+\end{eqnarray}
+
+\noindent If the free surface on the staggered grid is defined along $\sigma_{zz}$, $\sigma_{zz}$ is explicitly set to $0$ and $\sigma_{xz}$ over the free surface is an odd function such as:
+
+\begin{eqnarray}
+  \sigma_{zz}^{z(i)=0}(i,j) = 0, \nonumber \\
+  \sigma_{zz}^{z(i)=0}(i-\frac{1}{2},j) = -\sigma_{zz}^{z(i)=0}(i+\frac{1}{2},j)
+\end{eqnarray}
+
+\begin{figure}[!ht]
+  \centering
+  \includegraphics[width=0.9\columnwidth]{fig/validation_trac_fsurf.eps}
+  \caption{Comparison between analytical solution (gray line) and finite-difference modeling solution (black line) for an semi-infinite (free surface) homogeneous medium.}
+  \label{fig:validation_trac_fsurf}
 \end{figure}
 
 \section{Sources}
@@ -273,9 +302,12 @@ d_{0} = Ac_{p} \frac{log(1/R)}{2L_{PML}}\ ,
 
 \noindent Explosive source is added to normal stress $\sigma_{xx}$ and $\sigma{zz}$.
 
+\begin{equation}
+  F(i,j,t) = S(t)\frac{\Delta t}{\Delta x^{2}}
+\end{equation}
+
 \subsection{Body force source}
 \index{force source}
-
 
 
 % ----------------------------------------------------------------------
@@ -312,6 +344,8 @@ d_{0} = Ac_{p} \frac{log(1/R)}{2L_{PML}}\ ,
 \index{input parameters}
 \index{input files}
 
+
+
 % ----------------------------------------------------------------------
 % NUMERICAL EXAMPLES
 % ----------------------------------------------------------------------
@@ -325,14 +359,14 @@ d_{0} = Ac_{p} \frac{log(1/R)}{2L_{PML}}\ ,
 
 \begin{figure}[!ht]
   \centering
-  \includegraphics[scale=1.0]{fig/perez_model.eps}
+  \includegraphics[width=0.9\columnwidth]{fig/perez_model.eps}
   \caption{Diapir model. \cite{solano2014alternative}}
   \label{fig:perez_model}
 \end{figure}
 
 \begin{figure}[!ht]
   \centering
-  \includegraphics[scale=1.0]{fig/perez_model_profile.eps}
+  \includegraphics[width=0.9\columnwidth]{fig/perez_model_profile.eps}
   \caption{Diapir model.}
   \label{fig:perez_model}
 \end{figure}

@@ -1,0 +1,8 @@
+#!/bin/python2.7
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+f1 = np.fromfile('frciker_fwm', dtype=np.float32)
+plt.plot(f1)
+plt.show()

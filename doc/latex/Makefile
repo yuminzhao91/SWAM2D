@@ -9,6 +9,8 @@ $(NAME).pdf:
 
 %.dvi : %.tex
 	latex ${NAME}
+	latex ${NAME}
+	bibtex ${NAME}
 	bibtex ${NAME}
 	makeindex -s ${NAME}.ist ${NAME}
 	latex ${NAME}

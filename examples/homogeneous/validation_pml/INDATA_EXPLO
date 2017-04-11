@@ -1,0 +1,13 @@
+ C EXACT 2D RESPONSE FOR COMPRESSIONAL SOURCE
+ C  TMIN         TMAX         NTSTP
+ 0.00000000E+00  0.5          2000
+ C  DELAY        FP           ZS
+    5E-02        30.0         150.
+ C  XREC      ZREC     DXR     DZR      NREC
+    25.0     110.0     25.0   0.0      4                        
+ C  CP           CS
+    400.     250.
+ C  ITRACE(1)    ITRACE(2)    ITRACE(3)
+    1            1            1
+ C  OUTPUT(1)    OUTPUT(2)    DISPV       FAC
+    'TAB'      '   '          1           1.
