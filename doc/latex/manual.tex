@@ -200,11 +200,11 @@
   D^{-}=c_{1}[f(i)-f(i-1)]+c_{2}[f(i+1)-f(i-2)]
 \end{eqnarray}
 
-
+\citet{graves1996simulating}
 \index{Lam\'e parameters}
 \index{parameter harmonization}
 \begin{eqnarray}
-  \bar{\mu}(i+\frac{1}{2}, j+\frac{1}{2})=\frac{1}{4}(\mu(i,j)+\mu(i+1,j)+\mu(i,j+1)+\mu(i+1,j+1) \\
+  \bar{\mu}(i+\frac{1}{2}, j+\frac{1}{2})=\left[ \frac{1}{4} \left( \frac{1}{\mu(i,j)}+\frac{1}{\mu(i+1,j)}+\frac{1}{\mu(i,j+1)}+\frac{1}{\mu(i+1,j+1)} \right) \right]^{-1} \\
   \rho_{x}(i,j+\frac{1}{2}) = \frac{1}{2}(\rho (i,j+1)+\rho(i,j)) \\
   \rho_{z}(i+\frac{1}{2},j) = \frac{1}{2}(\rho (i+1,j)+\rho(i,j))
 \end{eqnarray}
@@ -292,6 +292,17 @@ d_{0} = Ac_{p} \frac{log(1/R)}{2L_{PML}}\ ,
   \includegraphics[width=0.9\columnwidth]{fig/validation_trac_fsurf.eps}
   \caption{Comparison between analytical solution (gray line) and finite-difference modeling solution (black line) for an semi-infinite (free surface) homogeneous medium.}
   \label{fig:validation_trac_fsurf}
+\end{figure}
+
+\subsection{Fluid-solid interface}
+\index{solid-fluid}
+
+Given the use of harmonic averaging of $\mu$, at the fluid-solid interface $\tau_{xz}$ naturally vanishes and satisfies implicitly the continuity conditions through the fluid-solid interface \citep{vanvossen2002finite}
+
+\begin{figure}[!ht]
+  \centering
+  \includegraphics[width=0.9\columnwidth]{fig/validation_snap_water.eps}
+  \caption{Snapshots of the pressure wavefield for a semi-infinite homogeneous model overlay by water. Black dashed line define the limits between PML and physical model, red line defines the free surface, blue line defines the fluid-solid interface.}
 \end{figure}
 
 \section{Sources}

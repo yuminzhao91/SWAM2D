@@ -73,7 +73,7 @@ contains
 
     type(typemod) :: tmod
 
-    integer :: i1, i2, it, n1e, n2e, nsp, nt, nts, nrec, its, ets, itsnap, ntsnap, isnap
+    integer :: i1, i2, it, n1e, n2e, nsp, nt, nts, nrec, its, ets, itsnap, ntsnap, isnap, nwater, iwater
     integer :: etsnap, ix, iz, irec, itt, srctype, isurf
     real :: start, finish
     real :: dt, tsrc(nt), gsrc(n1e, n2e), h, full
@@ -167,17 +167,25 @@ contains
        
        call dxforward(txx, n1e, n2e, d2)
        call dzbackward(txz, n1e, n2e, nsp, d1, isurf)
-
+       
        uxx(:, :) = (((1./dt-pmlx1(:,:))*uxx(:, :) &
             +(1./h)*tmod%bux(:, :)*d2(:, :))/(1./dt+pmlx1(:, :)))
+       !if(isurf == 1)then
        uxz(:, :) = (((1./dt-pmlz0(:,:))*uxz(:, :) &
-            +(1./h)*tmod%bux(:, :)*d1(:, :))/(1./dt+pmlz0(:, :)))
-
+               +(1./h)*tmod%bux(:, :)*d1(:, :))/(1./dt+pmlz0(:, :)))
+       !uxz(nsp+1,:) = (((1./dt-pmlz0(:,:))*uxz(:, :) &
+       !        +(1./h)*tmod%bux(:, :)*(txz(nsp,:)-txz(nsp-1,:)))/(1./dt+pmlz0(:, :)))
+       !else
+       !   uxz(:, :) = (((1./dt-pmlz0(:,:))*uxz(:, :) &
+       !        +(1./h)*tmod%bux(:, :)*d1(:, :))/(1./dt+pmlz0(:, :)))
+       !endif
+       
        !# UZ
        call dxbackward(txz, n1e, n2e, d2)
        call dzforward(tzz, n1e, n2e, nsp, d1, isurf)
        
        if(srctype== 2)then
+          !# Vertical body force source
           uzx(:, :) = (((1./dt-pmlx0(:,:))*uzx(:, :) &
                +(1./h)*tmod%buz(:, :)*d2(:, :))/(1./dt+pmlx0(:, :))) &
                +tmod%buz*(tsrc(it)*gsrc(:, :)*dt/(h*h))
@@ -195,7 +203,9 @@ contains
 
        ux(:, : ) = uxx(:, :)+uxz(:, :)
        uz(:, : ) = uzx(:, :)+uzz(:, :)
-
+       !ux(1:nsp+1,:) = 0.
+       !uz(1:nsp+1,:) = 0.
+       
        !# PRESSURE
        do i2=1,n2e-1
           do i1=2,n1e-1
@@ -215,6 +225,7 @@ contains
        call dxbackward(ux, n1e, n2e, d2)
        call dzbackward(uz, n1e, n2e, nsp, d1, isurf)
 
+       !# Explosive source
        if(srctype == 1)then
           txxx(:, :) = (((1./dt-pmlx0(:,:))*txxx(:, :) &
                +(1./h)*tmod%lbmu(:, :)*d2(:, :))/(1./dt+pmlx0(:, :))) &
@@ -238,7 +249,8 @@ contains
        
        txx(:, :) = txxx(:, :) + txxz(:, :)
        
-       if(srctype == 0 .or. srctype == 1)then
+       if(srctype == 1)then
+          !# Explosive source
           tzzx(:, :) = (((1./dt-pmlx0(:,:))*tzzx(:, :) &
                +(1./h)*tmod%lb0(:, :)*d2(:, :))/(1./dt+pmlx0(:, :))) &
                +(tsrc(it)*gsrc(:,:))/(h*h)*dt
@@ -250,6 +262,7 @@ contains
             +(1./h)*tmod%lbmu(:, :)*d1(:, :))/(1./dt+pmlz0(:, :)))
        
        tzz(:, :) = tzzx(:, :) + tzzz(:, :)
+      
        if(isurf == 1)then
           tzz(nsp+1,:) = 0.
           tzz(nsp,:) = -tzz(nsp+2,:)
@@ -269,7 +282,7 @@ contains
           txz(nsp,:) = -txz(nsp+1,:)
           txz(nsp-1,:) = -txz(nsp+2,:)
        end if
-
+       
        call cpu_time(finish)
        full = full+(finish-start)
        write(*, * ) it, nt, finish-start, full, sqrt(maxval(ux)**2+maxval(uz)**2)
@@ -328,23 +341,23 @@ contains
              open(33, file=snapfile, access='direct', recl=n1e*n2e*4)
              write(33, rec=1) press
              close(33)
+          else if(it >= 10000 .and. it < 100000)then
+             write (snapfile, "(A5,I5)") "snapz", it
+             open(31, file=snapfile, access='direct', recl=n1e*n2e*4)
+             write(31, rec=1) uz
+             close(31)
+             write (snapfile, "(A5,I5)") "snapx", it
+             open(32, file=snapfile, access='direct', recl=n1e*n2e*4)
+             write(32, rec=1) ux
+             close(32)
+             write (snapfile, "(A5,I5)") "snapp", it
+             open(33, file=snapfile, access='direct', recl=n1e*n2e*4)
+             write(33, rec=1) press
+             close(33)
           end if
        else
           itsnap = itsnap+1
        endif
-
-       !interpolate
-       do i2=1,n2e-1
-          do i1=1,n1e
-             uxe(i1,i2) = ux(i1,i2) !0.5*(ux(i1+1,i2)+ux(i1,i2))
-          enddo
-       enddo
-       
-       do i2=1,n2e
-          do i1=1,n1e-1
-             uze(i1,i2) = uz(i1,i2) !0.5*(uz(i1,i2)+uz(i1,i2))
-          enddo
-       enddo
        
        !write(*, * ) 'seismograms'
        if(its == ets .or. it == 1)then
