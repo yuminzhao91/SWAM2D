@@ -52,10 +52,11 @@ contains
     pmlz0(:, :) = 0.
     pmlz1(:, :) = 0.
 
-    r = 0.1
+    r = 0.0001
     vpmax = maxval(vpe)
     l = float(npml-1)*h
-    d0 = apml*vpmax*log(1./r)/(2*l)
+    !d0 = apml*vpmax*log(1./r)/(2*l)
+    d0 = float(ppml+1)*apml*log(1./r)/(2.*l)
     
     do i=1,npml+1
        val0 = float(npml-i+1)*h
@@ -65,14 +66,14 @@ contains
           pmlz0(i, :) = 0. !d0*(val0/l)**2
           pmlz1(i, :) = 0. !d0*(val1/l)**2
        else
-          pmlz0(i, :) = d0*(val0/l)**2
-          pmlz1(i, :) = d0*(val1/l)**2
+          pmlz0(i, :) = d0*(val0/l)**ppml !2
+          pmlz1(i, :) = d0*(val1/l)**ppml !2
        endif
        pmlz0(n1e+1-i,:) = d0*(val0/l)**ppml
        pmlz1(n1e+1-i, :) = d0*(val2/l)**ppml
-       pmlx0(:, i) = d0*(val0/l)**2
+       pmlx0(:, i) = d0*(val0/l)**ppml !2
        pmlx0(:, n2e+1-i) = d0*(val0/l)**ppml
-       pmlx1(:, i) = d0*(val1/l)**2
+       pmlx1(:, i) = d0*(val1/l)**ppml !2
        pmlx1(:, n2e+1-i) = d0*(val2/l)**ppml
     enddo
 
