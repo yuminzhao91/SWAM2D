@@ -30,38 +30,40 @@
 !------------------------------------------------------------------------------
 
 module param
-  implicit none
+  
+  use types
 
+  implicit none
+  
 contains
 
-  subroutine parread(frun, tmax, dt, fvp, fvs, fro, n1, n2, h, &
-       isurf, npml, apml, ppml, srctype, srcfunc, sigma, f0, t0, &
-       xs, zs, facqui, dts, isnap, dtsnap)
+  subroutine parread (trun, tmod, tbnd, tacq)
 
-    integer :: n1, n2, isurf, npml, srctype, srcfunc, ppml, isnap
-    real :: tmax, dt, h, apml, sigma, f0, t0, xs, zs, dts, dtsnap
-    character(len=*) :: frun, fvp, fvs, fro, facqui
+    type(typerun) :: trun
+    type(typemod) :: tmod
+    type(typebnd) :: tbnd
+    type(typeacq) :: tacq
 
-    open(101, file='param.input', status='old')
-    read(101, *) !#[run]
-    read(101, *) frun
-    read(101, *) tmax, dt
-    read(101, *) !#[materials]
-    read(101, *) fvp, fvs, fro
-    read(101, *) n1, n2, h
-    read(101, *) !#[boundaries]
-    read(101, *) isurf, npml, apml, ppml
-    read(101, *) ! #[source]
-    read(101, *) srctype, srcfunc, sigma
-    read(101, *) f0, t0
-    read(101, *) xs, zs 
-    read(101, *) !#[receiver]
-    read(101, *) facqui
-    read(101, *) dts
-    read(101, *) !#[snapshot]
-    read(101, *) isnap
-    read(101, *) dtsnap
-    close(101)
+    open (101, file='param.input', status='old')
+    read (101, *) !#[run]
+    read (101, *) trun%frun
+    read (101, *) trun%tmax, trun%dt
+    read (101, *) !#[materials]
+    read (101, *) tmod%fvp, tmod%fvs, tmod%fro
+    read (101, *) tmod%n1, tmod%n2, tmod%h
+    read (101, *) !#[boundaries]
+    read (101, *) tbnd%isurf, tbnd%npml, tbnd%apml, tbnd%ppml
+    read (101, *) ! #[source]
+    read (101, *) tacq%srctype, tacq%srcfunc, tacq%sigma
+    read (101, *) tacq%f0, tacq%t0
+    read (101, *) tacq%xs, tacq%zs 
+    read (101, *) !#[receiver]
+    read (101, *) tacq%facqui
+    read (101, *) tacq%dts
+    read (101, *) !#[snapshot]
+    read (101, *) trun%isnap
+    read (101, *) trun%dtsnap
+    close (101)
 
   end subroutine parread
 

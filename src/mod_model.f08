@@ -31,11 +31,13 @@
 
 module model
 
+  use types
+  
   implicit none
   
 contains
 
-  subroutine modread(fname, n1, n2, v)
+  subroutine modread (iunit, fname, n1, n2, v)
     !! subroutine: modread
     !> \brief read an input binary file (single precision).
     !> \param[in] fname name of the input physical parameter file
@@ -43,13 +45,13 @@ contains
     !> \param[in] n2 The number of grid points in the second direction (x)
     !> \param[out] v single precision array of size (n1, n2) containing
     !> parameter values.
-    integer :: n1, n2
+    integer :: n1, n2, iunit
     real :: v(n1, n2)
     character(len=*) :: fname
 
-    open(11, file=fname, access='direct', recl=n1*n2*4)
-    read(11, rec=1) v
-    close(11)
+    open(iunit, file=fname, access='direct', recl=n1*n2*4)
+    read(iunit, rec=1) v
+    close(iunit)
 
   end subroutine modread
 
@@ -63,23 +65,26 @@ contains
     !> \param[in] nsp The number of grid points added for ABC layers 
     !> \param[out] ve physical parameter array of size (n1+2*nsp, n2+2*nsp)
     integer :: i, n1, n2, nsp
-    real :: v(n1, n2), ve(n1+2*nsp, n2+2*nsp)
-
+    real :: ve(n1+2*nsp, n2+2*nsp)
+    real :: v(n1,n2)
+    
     ve(nsp+1:n1+nsp,nsp+1:n2+nsp) = v(1:n1,1:n2)
-
+  
     do i=1,nsp
        ve(:,i) = ve(:,nsp+1)
        ve(:,n2+nsp+i) = ve(:,n2+nsp)
     end do
-
+  
     do i=1,nsp
        ve(i, :) = ve(nsp+1, :)
        ve(n1+nsp+i, :) = ve(n1+nsp, :)
     end do
 
+    
   end subroutine modext
+
   
-  subroutine modbuo(roe, n1e, n2e, bux, buz)
+  subroutine modbuo (tmod)
     !! subroutine: modbuo
     !> \brief calculate buoyancies bux and buz from extend density
     !> model to fulfill staggered-grid 4th order finite-differences
@@ -91,22 +96,24 @@ contains
     !> of the extended grid
     !> \param[out] bux buoyancy model for the x-direction
     !> \param[out] buz buoyancy model for the z-direction
-    integer :: i1, i2, n1e, n2e
-    real, dimension(n1e, n2e) :: roe, bux, buz
 
-    do i2=1,n2e-1
-       bux(:, i2) = (1./2.)*(1./roe(:, i2)+1./roe(:, i2+1))
-    end do
-    bux(:,n2e) = 1./roe(:,n2e)
+    type(typemod) :: tmod
+    
+    integer :: i1, i2
 
-    do i1=1,n1e-1
-       buz(i1, :) = (1./2.)*(1./roe(i1, :)+1./roe(i1+1, :))
+    do i2=1,tmod%n2e-1
+       tmod%bux(:, i2) = (1./2.)*(1./tmod%roe(:, i2)+1./tmod%roe(:, i2+1))
     end do
-    buz(n1e,:) = 1./roe(n1e,:)
+    tmod%bux(:,tmod%n2e) = 1./tmod%roe(:,tmod%n2e)
+
+    do i1=1,tmod%n1e-1
+       tmod%buz(i1, :) = (1./2.)*(1./tmod%roe(i1, :)+1./tmod%roe(i1+1, :))
+    end do
+    tmod%buz(tmod%n1e,:) = 1./tmod%roe(tmod%n1e,:)
 
   end subroutine modbuo
 
-  subroutine modlame(vpe, vse, roe, n1e, n2e, mu0, mue, lb0, lbmu)
+  subroutine modlame (tmod) !(vpe, vse, roe, n1e, n2e, mu0, mue, lb0, lbmu)
     !! subroutine: modlame
     !> \brief calculate Lame's parameters \f$ \lambda \f$, \$f \mu \f$
     !> and \f$ mu_{e} \f$ from extend parameter models to fulfill
@@ -122,22 +129,27 @@ contains
     !> \param[out] mue \f$ \mu \f$ on staggered grid (intermediate gird points)
     !> \param[out] lb0 \f$ \lambda \f$ on normal grid (grid points)
     !> \param[out] lbmu \f$ \lambda+2\mu \f$ on normal grid (grid points)
-    integer :: i1, i2, n1e, n2e
-    real, dimension(n1e, n2e) :: vpe, vse, roe, mu0, mue, lb0, lbmu
+    type(typemod) :: tmod
+    integer :: i1, i2 !, n1e, n2e
+    !real, dimension(n1e, n2e) :: vpe, vse, roe, mu0, mue, lb0, lbmu
 
-    mu0(:, :) = vse(:, :)*vse(:, :)*roe(:, :)
+    tmod%mu0(:, :) = tmod%vse(:, :)*tmod%vse(:, :)*tmod%roe(:, :)
   
-    do i2=1,n2e-1
-       do i1=1, n2e-1
-          mue(i1, i2) = (1./4.)*(mu0(i1,i2)+mu0(i1+1,i2)+mu0(i1,i2+1)+mu0(i1+1,i2+1))
+    do i2=1,tmod%n2e-1
+       do i1=1, tmod%n1e-1
+          tmod%mue(i1, i2) = 1./((1./4.)* &
+               (1./tmod%mu0(i1,i2)+ &
+               1./tmod%mu0(i1+1,i2)+ &
+               1./tmod%mu0(i1,i2+1)+1./tmod%mu0(i1+1,i2+1)))
        end do
     end do
-    mue(:,n2e) = mue(:,n2e-1)
-    mue(n1e,:) = mue(n1e-1,:)
+    tmod%mue(:,tmod%n2e) = tmod%mue(:,tmod%n2e-1)
+    tmod%mue(tmod%n1e,:) = tmod%mue(tmod%n1e-1,:)
 
-    lb0(:, :) = vpe(:, :)*vpe(:, :)*roe(:, :)-2.*mu0(:, :)
+    tmod%lb0(:, :) = tmod%vpe(:, :)*tmod%vpe(:, :)*tmod%roe(:, :) &
+         -2.*tmod%mu0(:, :)
     
-    lbmu(:,:) = lb0(:, :)+2.*mu0(:,:)
+    tmod%lbmu(:,:) = tmod%lb0(:, :)+2.*tmod%mu0(:,:)
 
   end subroutine modlame
 

@@ -67,16 +67,18 @@ module marching
 
 contains
   
-  subroutine evolution(n1e, n2e, nsp, h,  dt, nt, nts, ntsnap, nrec, srctype, &
-       tsrc, gsrc, recx, recz, recp, recpos, tmod, isurf, &
-       pmlx0, pmlx1, pmlz0, pmlz1, isnap)
+  subroutine evolution(nt, nts, ntsnap, nrec, srctype, &
+       tsrc, gsrc, recx, recz, recp, recpos, trun, tmod, tbnd, tacq, isurf, isnap)
 
-    type(typemod) :: tmod
-
-    integer :: i1, i2, it, n1e, n2e, nsp, nt, nts, nrec, its, ets, itsnap, ntsnap, isnap
+    type (typerun) :: trun
+    type (typemod) :: tmod
+    type (typebnd) :: tbnd
+    type (typeacq) :: tacq
+    
+    integer :: i1, i2, it, nt, nts, nrec, its, ets, itsnap, ntsnap, isnap
     integer :: etsnap, ix, iz, irec, itt, srctype, isurf
     real :: start, finish
-    real :: dt, tsrc(nt), gsrc(n1e, n2e), h, full
+    real :: dt, tsrc(nt), gsrc(tmod%n1e, tmod%n2e), h, full
     real :: dth
 
     real :: recx(nts, nrec), recz(nts, nrec), recp(nts, nrec)
@@ -95,35 +97,52 @@ contains
 
     character(len=80) :: snapfile
 
-
+    ! >> TMP
+    real, allocatable :: tmp(:, : )
+    real, allocatable :: uxe(:, : ), uze(:, :)
+    
     ! >> ADDING PML TEMP. IN MARCHING MOD
-    real, dimension(n1e, n2e) :: pmlx0, pmlx1, pmlz0, pmlz1
+    !real, dimension (tmod%n1e, tmod%n2e) :: pmlx0, pmlx1, pmlz0, pmlz1
 
     ! >> END PML
    
     dth = dt/h
     
     ! >> Allocate derivative arrays
-    allocate(d1(n1e, n2e), d2(n1e, n2e))
+    allocate (d1(tmod%n1e, tmod%n2e))
+    allocate (d2(tmod%n1e, tmod%n2e))
 
     ! >> Allocate velocity fields
-    allocate(ux(n1e, n2e), uz(n1e, n2e))
+    allocate (ux(tmod%n1e, tmod%n2e))
+    allocate (uz(tmod%n1e, tmod%n2e))
 
     ! >> Allocate stress fields
-    allocate(txx(n1e, n2e), tzz(n1e, n2e), txz(n1e, n2e))
+    allocate (txx(tmod%n1e, tmod%n2e))
+    allocate (tzz(tmod%n1e, tmod%n2e))
+    allocate (txz(tmod%n1e, tmod%n2e))
 
     ! >> Allocate splited velocity fields
-    allocate(uxx(n1e, n2e), uxz(n1e, n2e))
-    allocate(uzx(n1e, n2e), uzz(n1e, n2e))
+    allocate (uxx(tmod%n1e, tmod%n2e))
+    allocate (uxz(tmod%n1e, tmod%n2e))
+    allocate (uzx(tmod%n1e, tmod%n2e))
+    allocate (uzz(tmod%n1e, tmod%n2e))
 
     ! >> Allocate splited stress fields 
-    allocate(txxx(n1e, n2e), txxz(n1e, n2e))
-    allocate(tzzx(n1e, n2e), tzzz(n1e, n2e))
-    allocate(txzx(n1e, n2e), txzz(n1e, n2e))
+    allocate (txxx(tmod%n1e, tmod%n2e))
+    allocate (txxz(tmod%n1e, tmod%n2e))
+    allocate (tzzx(tmod%n1e, tmod%n2e))
+    allocate (tzzz(tmod%n1e, tmod%n2e))
+    allocate (txzx(tmod%n1e, tmod%n2e))
+    allocate (txzz(tmod%n1e, tmod%n2e))
 
     ! >> Allocate pressure field
-    allocate(press(n1e, n2e))
+    allocate (press(tmod%n1e, tmod%n2e))
 
+    ! >> TEMP
+    allocate (tmp(tmod%n1e, tmod%n2e))
+    allocate (uxe(tmod%n1e, tmod%n2e))
+    allocate (uze(tmod%n1e, tmod%n2e))
+    
     ! >> Initialize velocity fields (including splitted)
     ux(:, :) = 0.
     uz(:, :) = 0.
@@ -132,6 +151,9 @@ contains
     uzx(:, :) = 0.
     uzz(:, : ) = 0.
 
+    uxe(:, :) = 0.
+    uze(:, :) = 0.
+    
     ! >> Initialize stress fields (including splitted)
     txx(:, :) = 0.
     tzz(:, :) = 0.
@@ -153,116 +175,119 @@ contains
 
     ! >> Start marching
     do it=1,nt
-       call cpu_time(start)
-       
-       call dxforward(txx, n1e, n2e, d2)
-       call dzbackward(txz, n1e, n2e, nsp, d1, isurf)
-       
-       uxx(:, :) = (((1./dt-pmlx1(:,:))*uxx(:, :) &
-            +(1./h)*tmod%bux(:, :)*d2(:, :))/(1./dt+pmlx1(:, :)))
-       uxz(:, :) = (((1./dt-pmlz0(:,:))*uxz(:, :) &
-            +(1./h)*tmod%bux(:, :)*d1(:, :))/(1./dt+pmlz0(:, :)))
-       ux(:, :) = uxx(:, :)+uxz(:, :)
-       if( isurf == 1)then
-          ux(1:nsp, :) = 0.
-       endif
+       call cpu_time (start)
 
-       !# UZ
-       call dxbackward(txz, n1e, n2e, d2)
-       call dzforward(tzz, n1e, n2e, nsp, d1, isurf)
-
-       if(srctype== 2)then
-          uzx(:, :) = (((1./dt-pmlx0(:,:))*uzx(:, :) &
-               +(1./h)*tmod%buz(:, :)*d2(:, :))/(1./dt+pmlx0(:, :))) &
-               +tmod%buz*(tsrc(it)*gsrc(:, :)*dt/(h*h))
+       !# >> Ux
+       call dxforward (txx, tmod%n1e, tmod%n2e, d2)
+       call dzbackward (txz, tmod%n1e, tmod%n2e, tbnd%npml, d1, tbnd%isurf)
+       
+       uxx(:, :) = (((1./trun%dt-tbnd%pmlx1(:,:))*uxx(:, :) &
+            +(1./tmod%h)*tmod%bux(:, :)*d2(:, :))/(1./trun%dt+tbnd%pmlx1(:, :)))
+       uxz(:, :) = (((1./trun%dt-tbnd%pmlz0(:,:))*uxz(:, :) &
+            +(1./tmod%h)*tmod%bux(:, :)*d1(:, :))/(1./trun%dt+tbnd%pmlz0(:, :)))
+       
+       !# >> Uz
+       call dxbackward (txz, tmod%n1e, tmod%n2e, d2)
+       call dzforward (tzz, tmod%n1e, tmod%n2e, tbnd%npml, d1, tbnd%isurf)
+       
+       if (srctype== 2) then
+          !# Vertical body force source
+          uzx(:, :) = (((1./trun%dt-tbnd%pmlx0(:,:))*uzx(:, :) &
+               +(1./tmod%h)*tmod%buz(:, :)*d2(:, :))/(1./trun%dt+tbnd%pmlx0(:, :))) &
+               +tmod%buz*(tsrc(it)*tacq%gsrc(:, :)*trun%dt/(tmod%h*tmod%h))
        else
-          uzx(:, :) = (((1./dt-pmlx0(:,:))*uzx(:, :) &
-               +(1./h)*tmod%buz(:, :)*d2(:, :))/(1./dt+pmlx0(:, :)))
+          uzx(:, :) = (((1./trun%dt-tbnd%pmlx0(:,:))*uzx(:, :) &
+               +(1./tmod%h)*tmod%buz(:, :)*d2(:, :))/(1./trun%dt+tbnd%pmlx0(:, :)))
        end if
 
-       uzz(:, :) = (((1./dt-pmlz1(:,:))*uzz(:, :) &
-            +(1./h)*tmod%buz(:, :)*d1(:, :))/(1./dt+pmlz1(:, :)))
+       uzz(:, :) = (((1./trun%dt-tbnd%pmlz1(:,:))*uzz(:, :) &
+            +(1./tmod%h)*tmod%buz(:, :)*d1(:, :))/(1./trun%dt+tbnd%pmlz1(:, :)))
 
-       uz(:, :) = uzx(:, :)+uzz(:, :)
-
-       if( isurf == 1)then
-          uz(1:nsp, :) = 0.
-       endif
        
-       call dirichlet( n1e, n2e, uxx, uxz, uzx, uzz)
+       call dirichlet (tmod%n1e, tmod%n2e, uxx, uxz, uzx, uzz)
        ! implement Dirichlet boundary conditions on the four edges of the grid
+
+       ux(:, : ) = uxx(:, :)+uxz(:, :)
+       uz(:, : ) = uzx(:, :)+uzz(:, :)
        
        !# PRESSURE
-       do i2=1,n2e-1
-          do i1=2,n1e-1
-             press(i1, i2) = (-tmod%lbmu(i1, i2)/h)*(ux(i1,i2)-ux(i1,i2-1) &
+       do i2=1,tmod%n2e-1
+          do i1=2,tmod%n1e-1
+             press(i1, i2) = (-tmod%lbmu(i1, i2)/tmod%h)*(ux(i1,i2)-ux(i1,i2-1) &
                   +uz(i1,i2)-uz(i1-1,i2))
           enddo
        enddo
 
        !# TXX -- TZZ
-       call dxbackward(ux, n1e, n2e, d2)
-       call dzbackward(uz, n1e, n2e, nsp, d1, isurf)
+       if(tbnd%isurf == 1)then
+          do i2=2,tmod%n2e
+             uz(tbnd%npml, i2) = uz(tbnd%npml+1, i2)+&
+                  tmod%lb0(tbnd%npml+1, i2)/tmod%lbmu(tbnd%npml+1,i2)*&
+                  (ux(tbnd%npml+1,i2)-ux(tbnd%npml+1,i2-1))
+          enddo
+       endif
+       call dxbackward(ux, tmod%n1e, tmod%n2e, d2)
+       call dzbackward(uz, tmod%n1e, tmod%n2e, tbnd%npml, d1, tbnd%isurf)
 
+       !# Explosive source
        if(srctype == 1)then
-          txxx(:, :) = (((1./dt-pmlx0(:,:))*txxx(:, :) &
-               +(1./h)*tmod%lbmu(:, :)*d2(:, :))/(1./dt+pmlx0(:, :))) &
-               +(tsrc(it)*gsrc(:,:))/(h*h)*dt
+          txxx(:, :) = (((1./trun%dt-tbnd%pmlx0(:,:))*txxx(:, :) &
+               +(1./h)*tmod%lbmu(:, :)*d2(:, :))/(1./trun%dt+tbnd%pmlx0(:, :))) &
+               +(tsrc(it)*tacq%gsrc(:,:))/(tmod%h*tmod%h)*trun%dt
        else
-          txxx(:, :) = (((1./dt-pmlx0(:,:))*txxx(:, :) &
-               +(1./h)*tmod%lbmu(:, :)*d2(:, :))/(1./dt+pmlx0(:, :)))
+          txxx(:, :) = (((1./trun%dt-tbnd%pmlx0(:,:))*txxx(:, :) &
+               +(1./tmod%h)*tmod%lbmu(:, :)*d2(:, :))/(1./trun%dt+tbnd%pmlx0(:, :)))
        end if
-       
-       txxz(:, :) = (((1./dt-pmlz0(:,:))*txxz(:, :) &
-            +(1./h)*tmod%lb0(:, :)*d1(:, :))/(1./dt+pmlz0(:, :)))
 
-       txx(:, :) = txxx(:, :) + txxz(:, :)
-       if(isurf == 1)then
-          txxz(nsp+1,:) = (((1./dt-pmlz0(nsp+1,:)) &
-               *txxz(nsp+1, :)+(1./h)*tmod%lb0(nsp+1,:) &
-               /tmod%lbmu(nsp+1,:)*d2(nsp+1,:))/(1./dt+pmlz0(nsp+1, :)))
-          !txx(nsp+1, :) = txxx(nsp+1,:)+txxz(nsp+1,:)
-          !-dt*tmod%lb0(nsp+1,:)/tmod%lbmu(nsp+1,:)*d2(nsp+1,:)
-          txx(nsp+1, :) = txxx(nsp+1,:)-dt*tmod%lb0(nsp+1,:)/tmod%lbmu(nsp+1,:)*d2(nsp+1,:)
-       end if
-       
-       if(srctype == 0 .or. srctype == 1)then
-          tzzx(:, :) = (((1./dt-pmlx0(:,:))*tzzx(:, :) &
-               +(1./h)*tmod%lb0(:, :)*d2(:, :))/(1./dt+pmlx0(:, :))) &
-               +(tsrc(it)*gsrc(:,:))/(h*h)*dt
+       if( tbnd%isurf == 1 )then
+          tmp(:, :) = txxz(:, :)
+          txxz(:, :) = (((1./trun%dt-tbnd%pmlz0(:,:))*txxz(:, :) &
+               +(1./tmod%h)*tmod%lb0(:, :)*d1(:, :))/(1./trun%dt+tbnd%pmlz0(:, :)))
+          txxz(tbnd%npml+1 ,:) = (((1./trun%dt-tbnd%pmlx0(tbnd%npml+1,:))*tmp(tbnd%npml+1, :) &
+               -(1./tmod%h)*tmod%lb0(tbnd%npml+1, :)*tmod%lb0(tbnd%npml+1, :)/tmod%lbmu(tbnd%npml+1,:)&
+               *(uz(tbnd%npml+1,:)-uz(tbnd%npml,:)))/(1./trun%dt+tbnd%pmlx0(tbnd%npml+1, :)))
        else
-          tzzx(:, :) = (((1./dt-pmlx0(:,:))*tzzx(:, :) &
-               +(1./h)*tmod%lb0(:, :)*d2(:, :))/(1./dt+pmlx0(:, :)))
+          txxz(:, :) = (((1./trun%dt-tbnd%pmlz0(:,:))*txxz(:, :) &
+               +(1./tmod%h)*tmod%lb0(:, :)*d1(:, :))/(1./trun%dt+tbnd%pmlz0(:, :)))
+       endif
+       
+       txx(:, :) = txxx(:, :) + txxz(:, :)
+       
+       if(srctype == 1)then
+          !# Explosive source
+          tzzx(:, :) = (((1./trun%dt-tbnd%pmlx0(:,:))*tzzx(:, :) &
+               +(1./tmod%h)*tmod%lb0(:, :)*d2(:, :))/(1./trun%dt+tbnd%pmlx0(:, :))) &
+               +(tsrc(it)*tacq%gsrc(:,:))/(tmod%h*tmod%h)*trun%dt
+       else
+          tzzx(:, :) = (((1./trun%dt-tbnd%pmlx0(:,:))*tzzx(:, :) &
+               +(1./tmod%h)*tmod%lb0(:, :)*d2(:, :))/(1./trun%dt+tbnd%pmlx0(:, :)))
        end if
-       tzzz(:, :) = (((1./dt-pmlz0(:,:))*tzzz(:, :) &
-            +(1./h)*tmod%lbmu(:, :)*d1(:, :))/(1./dt+pmlz0(:, :)))
+       tzzz(:, :) = (((1./trun%dt-tbnd%pmlz0(:,:))*tzzz(:, :) &
+            +(1./tmod%h)*tmod%lbmu(:, :)*d1(:, :))/(1./trun%dt+tbnd%pmlz0(:, :)))
        
        tzz(:, :) = tzzx(:, :) + tzzz(:, :)
-       if(isurf == 1)then
-          tzz(nsp+1,:) = 0.
-          tzz(nsp,:) = -tzz(nsp+2,:)
+      
+       if(tbnd%isurf == 1)then
+          tzz(tbnd%npml+1,:) = 0.
+          tzz(tbnd%npml,:) = -tzz(tbnd%npml+2,:)
        end if
 
        !# TXZ
-       call dxforward(uz, n1e, n2e, d2)
-       call dzforward(ux, n1e, n2e, nsp, d1, isurf)
+       call dxforward (uz, tmod%n1e, tmod%n2e, d2)
+       call dzforward (ux, tmod%n1e, tmod%n2e, tbnd%npml, d1, tbnd%isurf)
 
-       txzx(:, :) = (((1./dt-pmlx1(:,:))*txzx(:, :) &
-            +(1./h)*tmod%mue(:, :)*d2(:, :))/(1./dt+pmlx1(:, :)))
-       txzz(:, :) = (((1./dt-pmlz1(:,:))*txzz(:, :) &
-            +(1./h)*tmod%mue(:, :)*d1(:, :))/(1./dt+pmlz1(:, :)))
+       txzx(:, :) = (((1./trun%dt-tbnd%pmlx1(:,:))*txzx(:, :) &
+            +(1./tmod%h)*tmod%mue(:, :)*d2(:, :))/(1./trun%dt+tbnd%pmlx1(:, :)))
+       txzz(:, :) = (((1./trun%dt-tbnd%pmlz1(:,:))*txzz(:, :) &
+            +(1./tmod%h)*tmod%mue(:, :)*d1(:, :))/(1./trun%dt+tbnd%pmlz1(:, :)))
        
        txz(:, :) = txzx(:, :)+txzz(:, :)
-       if(isurf == 1)then
-          !txz(nsp+1,:) = 0.
-          !txz(nsp,:) = -txz(nsp+2,:) !+1
-          !txz(nsp-1,:) = -txz(nsp+3,:) !+2
-          txz(nsp,:) = 0.
-          txz(nsp-1,:) = -txz(nsp+1,:) !+1
-          txz(nsp-2,:) = -txz(nsp+2,:) !+2
+       if(tbnd%isurf == 1)then
+          txz(tbnd%npml,:) = -txz(tbnd%npml+1,:)
+          txz(tbnd%npml-1,:) = -txz(tbnd%npml+2,:)
        end if
-
-       call cpu_time(finish)
+       
+       call cpu_time (finish)
        full = full+(finish-start)
        write(*, * ) it, nt, finish-start, full, sqrt(maxval(ux)**2+maxval(uz)**2)
 
@@ -270,69 +295,82 @@ contains
           itsnap = 1
           if(it < 10)then
              write (snapfile, "(A9,I1)") "snapz0000", it
-             open(31, file=snapfile, access='direct', recl=n1e*n2e*4)
+             open(31, file=snapfile, access='direct', recl=tmod%n1e*tmod%n2e*4)
              write(31, rec=1) uz
              close(31)
              write (snapfile, "(A9,I1)") "snapx0000", it
-             open(32, file=snapfile, access='direct', recl=n1e*n2e*4)
+             open(32, file=snapfile, access='direct', recl=tmod%n1e*tmod%n2e*4)
              write(32, rec=1) ux
              close(32)
              write (snapfile, "(A9,I1)") "snapp0000", it
-             open(33, file=snapfile, access='direct', recl=n1e*n2e*4)
+             open(33, file=snapfile, access='direct', recl=tmod%n1e*tmod%n2e*4)
              write(33, rec=1) press
              close(33)
           else if(it >= 10 .and. it < 100)then
              write (snapfile, "(A8,I2)") "snapz000", it
-             open(31, file=snapfile, access='direct', recl=n1e*n2e*4)
+             open(31, file=snapfile, access='direct', recl=tmod%n1e*tmod%n2e*4)
              write(31, rec=1) uz
              close(31)
              write (snapfile, "(A8,I2)") "snapx000", it
-             open(32, file=snapfile, access='direct', recl=n1e*n2e*4)
+             open(32, file=snapfile, access='direct', recl=tmod%n1e*tmod%n2e*4)
              write(32, rec=1) ux
              close(32)
              write (snapfile, "(A8,I2)") "snapp000", it
-             open(33, file=snapfile, access='direct', recl=n1e*n2e*4)
+             open(33, file=snapfile, access='direct', recl=tmod%n1e*tmod%n2e*4)
              write(33, rec=1) press
              close(33)
           else if(it >= 100 .and. it < 1000)then
              write (snapfile, "(A7,I3)") "snapz00", it
-             open(31, file=snapfile, access='direct', recl=n1e*n2e*4)
+             open(31, file=snapfile, access='direct', recl=tmod%n1e*tmod%n2e*4)
              write(31, rec=1) uz
              close(31)
              write (snapfile, "(A7,I3)") "snapx00", it
-             open(32, file=snapfile, access='direct', recl=n1e*n2e*4)
+             open(32, file=snapfile, access='direct', recl=tmod%n1e*tmod%n2e*4)
              write(32, rec=1) ux
              close(32)
              write (snapfile, "(A7,I3)") "snapp00", it
-             open(33, file=snapfile, access='direct', recl=n1e*n2e*4)
+             open(33, file=snapfile, access='direct', recl=tmod%n1e*tmod%n2e*4)
              write(33, rec=1) press
              close(33)
           else if(it >= 1000 .and. it < 10000)then
              write (snapfile, "(A6,I4)") "snapz0", it
-             open(31, file=snapfile, access='direct', recl=n1e*n2e*4)
+             open(31, file=snapfile, access='direct', recl=tmod%n1e*tmod%n2e*4)
              write(31, rec=1) uz
              close(31)
              write (snapfile, "(A6,I4)") "snapx0", it
-             open(32, file=snapfile, access='direct', recl=n1e*n2e*4)
+             open(32, file=snapfile, access='direct', recl=tmod%n1e*tmod%n2e*4)
              write(32, rec=1) ux
              close(32)
              write (snapfile, "(A6,I4)") "snapp0", it
-             open(33, file=snapfile, access='direct', recl=n1e*n2e*4)
+             open(33, file=snapfile, access='direct', recl=tmod%n1e*tmod%n2e*4)
+             write(33, rec=1) press
+             close(33)
+          else if(it >= 10000 .and. it < 100000)then
+             write (snapfile, "(A5,I5)") "snapz", it
+             open(31, file=snapfile, access='direct', recl=tmod%n1e*tmod%n2e*4)
+             write(31, rec=1) uz
+             close(31)
+             write (snapfile, "(A5,I5)") "snapx", it
+             open(32, file=snapfile, access='direct', recl=tmod%n1e*tmod%n2e*4)
+             write(32, rec=1) ux
+             close(32)
+             write (snapfile, "(A5,I5)") "snapp", it
+             open(33, file=snapfile, access='direct', recl=tmod%n1e*tmod%n2e*4)
              write(33, rec=1) press
              close(33)
           end if
        else
           itsnap = itsnap+1
        endif
-
+       
        !write(*, * ) 'seismograms'
        if(its == ets .or. it == 1)then
           its = 1
           do irec=1,nrec
              ix = recpos(irec, 1)
              iz = recpos(irec, 2)
-             recx(itt, irec) = (ux(iz, ix)+ux(iz,ix-1))/2.
-             recz(itt, irec) = (uz(iz, ix)+uz(iz-1,ix))/2.
+             recx(itt, irec) = ux(iz,ix) !(ux(iz, ix)+ux(iz,ix-1))/2.
+             recz(itt, irec) = uz(iz,ix) !(uz(iz+1, ix)+uz(iz,ix))/2.
              recp(itt, irec) = press(iz, ix)
           end do
           itt = itt + 1
@@ -340,27 +378,27 @@ contains
           its = its + 1
        end if
 
-       !write(*, * ) 'end seismo'
-
     end do
 
-    deallocate(d1, d2)
+    deallocate (d1, d2)
 
     ! >> Free velocity fields 
-    deallocate(ux, uz)
+    deallocate (ux, uz)
 
     ! >> Free splitted velocity fields
-    deallocate(uxx, uxz, uzx, uzz)
+    deallocate (uxx, uxz, uzx, uzz)
 
     ! >> Free stress fields
-    deallocate(txx, tzz, txz)
+    deallocate (txx, tzz, txz)
 
     ! >> Free splitted stress fields
-    deallocate(txxx, txxz, tzzx, tzzz, txzx, txzz)
+    deallocate (txxx, txxz, tzzx, tzzz, txzx, txzz)
 
     ! >> Free pressure field
-    deallocate(press)
+    deallocate (press)
 
+    deallocate (uxe, uze)
+    
   end subroutine evolution
 
 end module marching

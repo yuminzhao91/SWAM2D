@@ -30,57 +30,61 @@
 !------------------------------------------------------------------------------
 
 module boundaries
-
+  use types
+  
   implicit none
 
 contains
 
-  subroutine pmlmod(vpe, n1e, n2e, h, npml, apml, ppml, &
-       pmlx0, pmlx1, pmlz0, pmlz1, isurf)
+  subroutine pmlmod (tmod, tbnd)
 
+    type(typemod) :: tmod
+    type(typebnd) :: tbnd
+    
     ! ADD IF ISURF HERE
     ! DO NOT CONSTRUCT TOP PML IN CASE OF FREE SURFACE.
-    integer :: n1e, n2e, npml, ppml, i, isurf
-    real :: apml, val0, val1, val2
-    real, dimension(n1e, n2e) :: vpe, pmlx0, pmlx1, pmlz0, pmlz1
+    integer :: i 
+    real :: val0, val1, val2
 
-    real :: r, vpmax, d0, l, h
+    real :: r, vpmax, d0, l !, h
     
     ! >> Initialize pml arrays
-    pmlx0(:, :) = 0.
-    pmlx1(:, :) = 0.
-    pmlz0(:, :) = 0.
-    pmlz1(:, :) = 0.
+    tbnd%pmlx0(:, :) = 0.
+    tbnd%pmlx1(:, :) = 0.
+    tbnd%pmlz0(:, :) = 0.
+    tbnd%pmlz1(:, :) = 0.
 
-    r = 0.0001
-    vpmax = maxval(vpe)
-    l = float(npml-1)*h
-    !d0 = apml*vpmax*log(1./r)/(2*l)
-    d0 = float(ppml+1)*apml*log(1./r)/(2.*l)
+    r = 0.0001 !0.9
+    vpmax = maxval(tmod%vpe)
+    l = float(tbnd%npml-1)*tmod%h
+    !d0 = tbnd%apml*vpmax*log(1./r)/(2*l)
+    d0 = float(tbnd%ppml+1)*tbnd%apml*log(1./r)/(2.*l)
     
-    do i=1,npml+1
-       val0 = float(npml-i+1)*h
-       val1 = float(npml-i+1)*h-(h/2.)
-       val2 = float(npml-i+1)*h+(h/2.)
-       if(isurf == 1)then
-          pmlz0(i, :) = 0. !d0*(val0/l)**2
-          pmlz1(i, :) = 0. !d0*(val1/l)**2
+    do i=1,tbnd%npml+1
+       val0 = float(tbnd%npml-i+1)*tmod%h
+       val1 = float(tbnd%npml-i+1)*tmod%h-(tmod%h/2.)
+       val2 = float(tbnd%npml-i+1)*tmod%h+(tmod%h/2.)
+       if (tbnd%isurf == 1) then
+          tbnd%pmlz0(i, :) = 0. !d0*(val0/l)**2
+          tbnd%pmlz1(i, :) = 0. !d0*(val1/l)**2
        else
-          pmlz0(i, :) = d0*(val0/l)**ppml !2
-          pmlz1(i, :) = d0*(val1/l)**ppml !2
+          tbnd%pmlz0(i, :) = d0*(val0/l)**tbnd%ppml !2
+          tbnd%pmlz1(i, :) = d0*(val1/l)**tbnd%ppml !2
        endif
-       pmlz0(n1e+1-i,:) = d0*(val0/l)**ppml
-       pmlz1(n1e+1-i, :) = d0*(val2/l)**ppml
-       pmlx0(:, i) = d0*(val0/l)**ppml !2
-       pmlx0(:, n2e+1-i) = d0*(val0/l)**ppml
-       pmlx1(:, i) = d0*(val1/l)**ppml !2
-       pmlx1(:, n2e+1-i) = d0*(val2/l)**ppml
+       !tbnd%pmlz0(i, :) = d0*(val0/l)**ppml
+       !tbnd%pmlz1(i, :) = d0*(val1/l)**ppml
+       tbnd%pmlz0(tmod%n1e+1-i,:) = d0*(val0/l)**tbnd%ppml
+       tbnd%pmlz1(tmod%n1e+1-i, :) = d0*(val2/l)**tbnd%ppml
+       tbnd%pmlx0(:, i) = d0*(val0/l)**tbnd%ppml !2 !ppml
+       tbnd%pmlx0(:, tmod%n2e+1-i) = d0*(val0/l)**tbnd%ppml
+       tbnd%pmlx1(:, i) = d0*(val1/l)**tbnd%ppml !2 !ppml
+       tbnd%pmlx1(:, tmod%n2e+1-i) = d0*(val2/l)**tbnd%ppml
     enddo
 
-    pmlx0(:, :) = pmlx0(:, :)/2.
-    pmlx1(:, :) = pmlx1(:, :)/2.
-    pmlz0(:, :) = pmlz0(:, :)/2.
-    pmlz1(:, :) = pmlz1(:, :)/2.
+    tbnd%pmlx0(:, :) = tbnd%pmlx0(:, :)/2.
+    tbnd%pmlx1(:, :) = tbnd%pmlx1(:, :)/2.
+    tbnd%pmlz0(:, :) = tbnd%pmlz0(:, :)/2.
+    tbnd%pmlz1(:, :) = tbnd%pmlz1(:, :)/2.
     
   end subroutine pmlmod
 

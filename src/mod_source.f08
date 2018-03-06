@@ -57,13 +57,14 @@ contains
     
   end subroutine srcaddforce
   
-  subroutine srcindex(xs, zs, npml, h, is1, is2)
-    
-    integer :: npml, is1, is2
-    real :: xs, zs, h
+  subroutine srcindex(tmod, tbnd, tacq)
 
-    is1 = nint(zs/h)+npml+1
-    is2 = nint(xs/h)+npml+1
+    type (typemod) :: tmod
+    type (typebnd) :: tbnd
+    type (typeacq) :: tacq
+
+    tacq%izs = nint(tacq%zs/tmod%h)+tbnd%npml+1
+    tacq%ixs = nint(tacq%xs/tmod%h)+tbnd%npml+1
 
   end subroutine srcindex
 

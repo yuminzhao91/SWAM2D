@@ -32,12 +32,42 @@ module types
   
   implicit none
 
+  !* Run parameters
+  type typerun
+     integer              :: isnap
+     real                 :: tmax, dt, dtsnap
+     character(len=80)    :: frun
+  end type typerun
+  
+  !* Parameters related to physical parameter and grid size
   type typemod
+     integer              :: n1, n2
+     integer              :: n1e, n2e
+     real                 :: h
      real,    allocatable :: vp(:, :), vs(:, :), ro(:, :)
      real,    allocatable :: vpe(:, :), vse(:, :), roe(:, :)
      real,    allocatable :: bux(:, :), buz(:, :)
      real,    allocatable :: mu0(:, :), mue(:, :)
      real,    allocatable :: lb0(:, :), lbmu(:, :)
+     character(len=80)    :: fvp, fvs, fro
   end type typemod
 
+  !* Parameters related to boundary conditions 
+  type typebnd
+     integer              :: isurf
+     integer              :: npml, ppml
+     real                 :: apml
+     real, allocatable    :: pmlx0(:, :), pmlx1(:, :)
+     real, allocatable    :: pmlz0(:, :), pmlz1(:, :)
+  end type typebnd
+
+  !* Parameters related to acquisition
+  type typeacq
+     integer              :: srctype, srcfunc
+     integer              :: ixs, izs, nrec
+     real                 :: dts, sigma, f0, t0, xs, zs
+     real, allocatable    :: tsrc(:), gsrc(:, :)
+     character(len=80)    :: facqui
+  end type typeacq
+  
 end module types

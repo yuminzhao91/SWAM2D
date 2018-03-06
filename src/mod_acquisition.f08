@@ -31,35 +31,40 @@
 
 module acquisition
 
+  use types
+  
   implicit none
 
 contains
 
-  subroutine acqread(fname, nsp, h, nrec, recp)
+  subroutine acqread (tmod, tbnd, tacq, recp)
     
-    integer              :: irec, nrec, nsp, stat
-    character(len=*)     :: fname
-    real :: xr, zr, h
+    integer              :: irec, stat
+    real :: xr, zr
     integer,    allocatable :: recp(:, :)
 
-    nrec = 0
-    open(11, file=fname, status='old')
+    type (typemod) :: tmod
+    type (typebnd) :: tbnd
+    type (typeacq) :: tacq
+    
+    tacq%nrec = 0
+    open(11, file=tacq%facqui, status='old')
     do while(.true.)
        read(11, *, iostat=stat)
        !# if EOF: exit while loop
        if(stat /= 0) exit
        !# else: increment receiver number
-       nrec = nrec+1
+       tacq%nrec = tacq%nrec+1
     end do
 
     rewind(11)
 
-    allocate(recp(nrec, 2))
+    allocate(recp(tacq%nrec, 2))
     
-    do irec=1,nrec
+    do irec=1,tacq%nrec
        read(11, *) xr, zr
-       recp(irec, 1) = nint(xr/h)+nsp+1
-       recp(irec, 2) = nint(zr/h)+nsp+1
+       recp(irec, 1) = nint(xr/tmod%h)+tbnd%npml+1
+       recp(irec, 2) = nint(zr/tmod%h)+tbnd%npml+1
     end do
 
     close(11)

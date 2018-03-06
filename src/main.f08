@@ -28,118 +28,126 @@ program main
   use acquisition
 
   implicit none
-  
-  integer :: n1e, n2e, is1, is2
+
   integer :: nt, nts, ntsnap
-  integer :: nrec
-  real    :: tmax, t0, f0, sigma, xs, zs
-  real, allocatable :: tsrc(:), gsrc(:, :)
-  real, allocatable :: pmlx0(:, :), pmlx1(:, :)
-  real, allocatable :: pmlz0(:, :), pmlz1(:, :)
   real, allocatable :: recx(:, :), recz(:, :), recp(:, :)
   integer, allocatable :: recpos(:, :)
 
-  integer :: n1, n2, isurf, npml, srctype, srcfunc, isnap
-  real    :: dt, h, dts, apml, dtsnap
-  integer :: ppml
-  character(len=80) :: frun
-  character(len=80) :: fvp, fvs, fro, facqui
-
+  type(typerun) :: trun
   type(typemod) :: tmod
-
+  type(typebnd) :: tbnd
+  type(typeacq) :: tacq
+  
   !# >> Read input parameter file
-  call parread(frun, tmax, dt, fvp, fvs, fro, n1, n2, &
-       h, isurf, npml, apml, ppml, srctype, srcfunc, sigma, &
-       f0, t0, xs, zs, facqui, dts, isnap, dtsnap)
+  call parread (trun, tmod, tbnd, tacq)
   
   !# >> Get source position index on extend grid
-  call srcindex(xs, zs, npml, h, is1, is2)
+  call srcindex (tmod, tbnd, tacq)
 
-  nt = nint(tmax/dt)+1
-  nts = nint(tmax/dts)+1
-  ntsnap = nint(tmax/dtsnap)+1
+  nt = nint(trun%tmax/trun%dt)+1
+  nts = nint(trun%tmax/tacq%dts)+1
+  ntsnap = nint(trun%tmax/trun%dtsnap)+1
 
   write(*, *) nt, nts, nt/nts+1, ntsnap
 
   !# >> Acquisition
-  call acqread(facqui, npml, h, nrec, recpos)
+  write(*,*) 'acqusition'
+  call acqread (tmod, tbnd, tacq, recpos)
+  !(tacq%facqui, tbnd%npml, tmod%h, tacq%nrec, recpos)
 
   !# >> Allocate recorded seismogram arrays
-  allocate(recx(nts, nrec), recz(nts, nrec), recp(nts, nrec))
+  write(*,*) 'allocate 1'
+  allocate (recx(nts, tacq%nrec), recz(nts, tacq%nrec), recp(nts, tacq%nrec))
 
   !# >> Extend model dimensions with PML
-  n1e = n1+2*npml
-  n2e = n2+2*npml
+  tmod%n1e = tmod%n1+2*tbnd%npml
+  tmod%n2e = tmod%n2+2*tbnd%npml
   
   !# >> Allocate model matrices
-  allocate(tmod%vp(n1, n2), tmod%vs(n1, n2), tmod%ro(n1, n2))
+  write(*,*) 'allocate 2'
+  allocate (tmod%vp(tmod%n1, tmod%n2))
+  allocate (tmod%vs(tmod%n1, tmod%n2))
+  allocate (tmod%ro(tmod%n1, tmod%n2))
   
   !# >> Read model files
-  call modread(fvp, n1, n2, tmod%vp)
-  call modread(fvs, n1, n2, tmod%vs)
-  call modread(fro, n1, n2, tmod%ro)
+  write(*,*) 'read model files'
+  call modread (21, tmod%fvp, tmod%n1, tmod%n2, tmod%vp)
+  call modread (22, tmod%fvs, tmod%n1, tmod%n2, tmod%vs)
+  call modread (23, tmod%fro, tmod%n1, tmod%n2, tmod%ro)
 
   !# >> Extend models with pmls
-  allocate(tmod%vpe(n1e, n2e), tmod%vse(n1e, n2e), tmod%roe(n1e, n2e))
+  write(*,*) 'allocate 3'
+  allocate (tmod%vpe(tmod%n1e, tmod%n2e))
+  allocate (tmod%vse(tmod%n1e, tmod%n2e))
+  allocate (tmod%roe(tmod%n1e, tmod%n2e))
 
-  call modext(tmod%vp, n1, n2, npml, tmod%vpe)
-  call modext(tmod%vs, n1, n2, npml, tmod%vse)
-  call modext(tmod%ro, n1, n2, npml, tmod%roe)
-
-  !# >> Buoyancy and Lame parameters
-  allocate(tmod%bux(n1e, n2e), tmod%buz(n1e, n2e))
-  allocate(tmod%mu0(n1e, n2e), tmod%mue(n1e, n2e))
-  allocate(tmod%lb0(n1e, n2e), tmod%lbmu(n1e,n2e))
+  call modext (tmod%vp, tmod%n1, tmod%n2, tbnd%npml, tmod%vpe)
+  call modext (tmod%vs, tmod%n1, tmod%n2, tbnd%npml, tmod%vse)
+  call modext (tmod%ro, tmod%n1, tmod%n2, tbnd%npml, tmod%roe)
   
-  call modbuo(tmod%roe, n1e, n2e, tmod%bux, tmod%buz)
-  call modlame(tmod%vpe, tmod%vse, tmod%roe, n1e, n2e, tmod%mu0, tmod%mue, tmod%lb0, tmod%lbmu)
+  !# >> Buoyancy and Lame parameters
+  write(*,*) 'allocate 4'
+  allocate (tmod%bux(tmod%n1e, tmod%n2e), tmod%buz(tmod%n1e, tmod%n2e))
+  allocate (tmod%mu0(tmod%n1e, tmod%n2e), tmod%mue(tmod%n1e, tmod%n2e))
+  allocate (tmod%lb0(tmod%n1e, tmod%n2e), tmod%lbmu(tmod%n1e,tmod%n2e))
+
+  write(*,*) 'lame'
+  call modbuo (tmod)
+  call modlame (tmod)
 
   !# >> Stability condition
-  write(*, *) 'Courant::', dt*maxval(tmod%vp)/h
-
-  allocate(pmlx0(n1e, n2e), pmlx1(n1e, n2e))
-  allocate(pmlz0(n1e, n2e), pmlz1(n1e, n2e))
-
-  !# >> Calculate PMLs
-  call pmlmod(tmod%vpe, n1e, n2e, h, npml, apml, ppml, &
-       pmlx0, pmlx1, pmlz0, pmlz1, isurf)
+  write(*, *) trun%dt, maxval(tmod%vpe), tmod%h
+  write(*, *) 'Courant::', trun%dt*maxval(tmod%vpe)/tmod%h
   
   !# >> Deallocate model matrices
-  deallocate(tmod%vp, tmod%vs, tmod%ro)
-  deallocate(tmod%vpe, tmod%vse, tmod%roe)
+  write(*,*) 'deallocate'
+  deallocate (tmod%vp, tmod%vs, tmod%ro)
+  deallocate (tmod%vpe, tmod%vse, tmod%roe)
+  
+  !# >> Allocate PMLs
+  allocate (tbnd%pmlx0(tmod%n1e, tmod%n2e))
+  allocate (tbnd%pmlx1(tmod%n1e, tmod%n2e))
+  allocate (tbnd%pmlz0(tmod%n1e, tmod%n2e))
+  allocate (tbnd%pmlz1(tmod%n1e, tmod%n2e))
+
+  !# >> Calculate PMLs
+  call pmlmod (tmod, tbnd)
 
   !# >> Source
-  allocate(tsrc(nt), gsrc(n1e, n2e)) 
-  call ricker(nt, dt, f0, t0, tsrc)
+  allocate (tacq%tsrc(nt))
+  allocate (tacq%gsrc(tmod%n1e, tmod%n2e)) 
+  call ricker (nt, trun%dt, tacq%f0, tacq%t0, tacq%tsrc)
 
-  !# srcspread strongly affect results remove and replace with single point gsrc
-  call srcspread(n1e, n2e, npml, is1, is2, h, gsrc, sigma)
+  !# >> Spread source over several grid points
+  call srcspread (tmod%n1e, tmod%n2e, tbnd%npml, tacq%izs, tacq%ixs, tmod%h, &
+       tacq%gsrc, tacq%sigma)
 
-  write(*, * ) 'EVOLUTION'
-  call evolution(n1e, n2e, npml, h, dt, nt, nts, ntsnap, nrec, srctype, tsrc, &
-       gsrc, recx, recz, recp, recpos, tmod, isurf, &
-       pmlx0, pmlx1, pmlz0, pmlz1, isnap)
+  write( *, * ) 'ENTERING EVOLUTION'
+  call evolution (nt, nts, ntsnap, &
+       tacq%nrec, tacq%srctype, tacq%tsrc, &
+       tacq%gsrc, recx, recz, recp, recpos, trun, tmod, tbnd, tacq, tbnd%isurf, trun%isnap)
 
   !# write seismos
-  write(*, * ) nts, nrec
-  open(41, file='recx.bin', access='direct', recl=nts*nrec*4)
+  write(*, * ) nts, tacq%nrec
+  open(41, file='recx.bin', access='direct', recl=nts*tacq%nrec*4)
   write(41, rec=1) recx
   close(41)
-  open(42, file='recz.bin', access='direct', recl=nts*nrec*4)
+  open(42, file='recz.bin', access='direct', recl=nts*tacq%nrec*4)
   write(42, rec=1) recz
   close(42)
-  open(43, file='recp.bin', access='direct', recl=nts*nrec*4)
+  open(43, file='recp.bin', access='direct', recl=nts*tacq%nrec*4)
   write(43, rec=1) recp
   close(43)
 
-  call acqfree(recpos)
-  deallocate(recx, recz, recp)
+  call acqfree (recpos)
+  deallocate (recx, recz, recp)
 
-  deallocate(tsrc, gsrc)
-  deallocate(tmod%bux, tmod%buz)
-  deallocate(tmod%mu0, tmod%mue)
-  deallocate(tmod%lb0, tmod%lbmu)
+  deallocate (tacq%tsrc, tacq%gsrc)
+  deallocate (tmod%bux, tmod%buz)
+  deallocate (tmod%mu0, tmod%mue)
+  deallocate (tmod%lb0, tmod%lbmu)
 
-  deallocate(pmlx0, pmlx1, pmlz0, pmlz1)
+  deallocate (tbnd%pmlx0, tbnd%pmlx1)
+  deallocate (tbnd%pmlz0, tbnd%pmlz1)
   
 end program main
